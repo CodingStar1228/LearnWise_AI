@@ -1,119 +1,325 @@
 #!/usr/bin/env python3
 """
-Minimal AP/IB textbook ingestion: extract text from PDFs → scaffold course JSON.
-Full LLM question extraction can be added later; this creates chapters + sample KP.
+EasyEdu / LearnWise_AI — AP/IB textbook ingestion pipeline.
+
+Pipeline:
+  1. Extract text from each PDF in textbooks/<AP|IB>/ (PyMuPDF, pdfplumber fallback)
+  2. Split into chunks (~chunk_chars each)
+  3. For each chunk, call the SELF-HOSTED LLM (via src.agents.llm) to generate
+     a knowledge point + several IB/AP bilingual questions as structured JSON
+  4. Write standard EasyEdu schema:
+       data/courses/<COURSE>/<subject>/chapters.json
+       data/courses/<COURSE>/<subject>/questions/ch01.json ...
+       data/courses/<COURSE>/<subject>/knowledgepoints/ch01.json ...
+       data/courses/<COURSE>/<subject>/knowledgepoints/all_knowledgepoints.json
+
+Run on a machine where the model server is up (see docs/MODEL_SERVING.md):
+    export EASYEDU_LLM_BACKEND=local_vllm
+    export EASYEDU_LLM_BASE_URL=http://127.0.0.1:8000/v1
+    python scripts/ingest_textbooks.py --course all --max-chunks 10
+
+Requires: pdfplumber or PyMuPDF (in requirements.txt), a running LLM endpoint.
 """
+import argparse
+import asyncio
 import json
 import re
+import sys
 from pathlib import Path
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 TEXTBOOKS = ROOT / "textbooks"
 COURSES = ROOT / "data" / "courses"
-MAX_PAGES_PER_BOOK = 30
 
 
-def extract_text_pdfplumber(pdf_path: Path, max_pages: int) -> list[str]:
+# --------------------------------------------------------------------------- #
+# LLM output schema
+# --------------------------------------------------------------------------- #
+class GenKnowledgePoint(BaseModel):
+    title: str
+    description: str = Field(..., description="Detailed explanation of the concept")
+    summary: str = Field(..., description="Concise summary used by the teacher agent")
+
+
+class GenQuestion(BaseModel):
+    title: str
+    content: str = Field(..., description="Question stem; include A/B/C/D options for MCQ")
+    type: str = "concept"
+    difficulty: int = 3
+    answer: str
+    key_points: List[str] = Field(default_factory=list)
+    explanation: str
+
+
+class GenSection(BaseModel):
+    chapter_title: str
+    knowledge_point: GenKnowledgePoint
+    questions: List[GenQuestion]
+
+
+GEN_SYSTEM = (
+    "You are a curriculum author for an IB/AP tutoring product. "
+    "From a textbook excerpt you create high-quality study material. "
+    "Lead with clear English (use correct IB/AP terminology); add a short Chinese "
+    "gloss in parentheses where it helps comprehension. "
+    "Output ONLY a single JSON object matching the requested schema — no markdown, no commentary."
+)
+
+GEN_USER_TEMPLATE = """Course: {course}
+Subject: {subject}
+
+Create study material from this textbook excerpt.
+
+Produce JSON with:
+- "chapter_title": a concise section title (EN, optional CN gloss)
+- "knowledge_point": {{ "title", "description", "summary" }}
+- "questions": a list of {n} questions, each {{ "title", "content", "type", "difficulty"(1-5), "answer", "key_points"[], "explanation" }}
+  - Mix question types (concept, calculation, application) appropriate for {course} {subject}
+  - For multiple-choice, put options A./B./C./D. inside "content" and the letter in "answer"
+  - Keep questions grounded in the excerpt; do not invent facts not supported by it
+
+Excerpt:
+\"\"\"
+{excerpt}
+\"\"\"
+"""
+
+
+# --------------------------------------------------------------------------- #
+# PDF extraction
+# --------------------------------------------------------------------------- #
+def extract_pages(pdf_path: Path, max_pages: int) -> List[str]:
+    """Return list of page texts. Tries PyMuPDF, then pdfplumber."""
+    pages = _extract_pymupdf(pdf_path, max_pages)
+    if pages:
+        return pages
+    return _extract_pdfplumber(pdf_path, max_pages)
+
+
+def _extract_pymupdf(pdf_path: Path, max_pages: int) -> List[str]:
+    try:
+        import fitz  # PyMuPDF
+    except ImportError:
+        return []
+    pages: List[str] = []
+    try:
+        doc = fitz.open(pdf_path)
+        for i, page in enumerate(doc):
+            if i >= max_pages:
+                break
+            text = page.get_text().strip()
+            if text:
+                pages.append(text)
+        doc.close()
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] PyMuPDF failed on {pdf_path.name}: {e}")
+        return []
+    return pages
+
+
+def _extract_pdfplumber(pdf_path: Path, max_pages: int) -> List[str]:
     try:
         import pdfplumber
     except ImportError:
         return []
-
-    pages = []
-    with pdfplumber.open(pdf_path) as pdf:
-        for i, page in enumerate(pdf.pages[:max_pages]):
-            text = page.extract_text() or ""
-            if text.strip():
-                pages.append(text.strip())
+    pages: List[str] = []
+    try:
+        with pdfplumber.open(pdf_path) as pdf:
+            for i, page in enumerate(pdf.pages):
+                if i >= max_pages:
+                    break
+                text = (page.extract_text() or "").strip()
+                if text:
+                    pages.append(text)
+    except Exception as e:  # noqa: BLE001
+        print(f"  [warn] pdfplumber failed on {pdf_path.name}: {e}")
+        return []
     return pages
 
 
+def chunk_pages(pages: List[str], chunk_chars: int, skip_front: int) -> List[str]:
+    """Group pages into ~chunk_chars text blocks; skip front matter pages."""
+    body = pages[skip_front:] if skip_front < len(pages) else pages
+    chunks: List[str] = []
+    buf = ""
+    for page in body:
+        if len(buf) + len(page) > chunk_chars and buf:
+            chunks.append(buf)
+            buf = page
+        else:
+            buf += "\n" + page
+    if buf.strip():
+        chunks.append(buf)
+    return chunks
+
+
+# --------------------------------------------------------------------------- #
+# Helpers
+# --------------------------------------------------------------------------- #
 def slug_from_path(pdf_path: Path) -> str:
-    name = pdf_path.stem.lower()
-    name = re.sub(r"[^a-z0-9]+", "_", name).strip("_")
+    name = re.sub(r"[^a-z0-9]+", "_", pdf_path.stem.lower()).strip("_")
     return name[:48]
 
 
-def ingest_book(pdf_path: Path, course_type: str) -> dict:
-    pages = extract_text_pdfplumber(pdf_path, MAX_PAGES_PER_BOOK)
-    subject_slug = slug_from_path(pdf_path)
-    out_dir = COURSES / course_type / subject_slug
-    out_dir.mkdir(parents=True, exist_ok=True)
+def write_json(path: Path, data) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
 
-    chapter_id = f"{course_type.lower()}_{subject_slug}_c01"
-    kp_id = f"{course_type.lower()}_{subject_slug}_kc01"
 
-    preview = "\n\n".join(pages[:3])[:2000] if pages else f"Placeholder for {pdf_path.name}"
+# --------------------------------------------------------------------------- #
+# Per-book ingestion
+# --------------------------------------------------------------------------- #
+async def ingest_book(client, pdf_path: Path, course: str, args) -> dict:
+    subject = slug_from_path(pdf_path)
+    prefix = f"{course.lower()}_{subject}"
+    out_dir = COURSES / course / subject
 
-    chapters = [{
-        "id": "01",
-        "title": pdf_path.stem,
-        "parent_id": "",
-        "order": 1,
-        "description": preview[:500],
-        "knowledge_points": [kp_id],
-        "sub_chapters": [],
-    }]
+    if out_dir.exists() and not args.overwrite and (out_dir / "chapters.json").exists():
+        print(f"  [skip] {course}/{subject} already exists (use --overwrite)")
+        return {"pdf": pdf_path.name, "subject": subject, "status": "skipped"}
 
-    knowledgepoints = [{
-        "id": kp_id,
-        "title": f"Introduction — {pdf_path.stem}",
-        "chapter_id": chapter_id,
-        "description": preview,
-        "summry": preview[:800],
-    }]
+    print(f"  extracting text: {pdf_path.name}")
+    pages = extract_pages(pdf_path, args.max_pages)
+    if not pages:
+        print(f"  [warn] no text extracted from {pdf_path.name} (scanned PDF? install OCR)")
+        return {"pdf": pdf_path.name, "subject": subject, "status": "no_text"}
 
-    questions = [{
-        "id": f"{course_type.lower()}_{subject_slug}_q01",
-        "title": "Concept check",
-        "content": (
-            f"Based on the opening of **{pdf_path.stem}**, explain one core idea "
-            "in your own words (Feynman style).\nA. ...\nB. ...\nC. ...\nD. ..."
-        ),
-        "difficulty": 2,
-        "type": "concept",
-        "knowledge_points": [kp_id],
-        "related_questions": [],
-        "reference_answer": {
-            "content": "Open-ended",
-            "key_points": ["Clear definition", "Example or application"],
-            "explanation": "Student should articulate the main concept from the textbook opening.",
-        },
-        "chapter": "01",
-    }]
+    chunks = chunk_pages(pages, args.chunk_chars, args.skip_front)[: args.max_chunks]
+    print(f"  {len(pages)} pages -> {len(chunks)} chunks (generating with LLM)")
 
-    (out_dir / "knowledgepoints").mkdir(parents=True, exist_ok=True)
-    (out_dir / "questions").mkdir(parents=True, exist_ok=True)
+    chapters = []
+    all_kps = []
+    q_count = 0
 
-    with open(out_dir / "chapters.json", "w", encoding="utf-8") as f:
-        json.dump(chapters, f, ensure_ascii=False, indent=2)
-    with open(out_dir / "knowledgepoints" / "ch01.json", "w", encoding="utf-8") as f:
-        json.dump(knowledgepoints, f, ensure_ascii=False, indent=2)
-    with open(out_dir / "questions" / "ch01.json", "w", encoding="utf-8") as f:
-        json.dump(questions, f, ensure_ascii=False, indent=2)
+    for idx, chunk in enumerate(chunks, 1):
+        cid = f"{idx:02d}"
+        try:
+            section = await client.chat_json(
+                [
+                    {"role": "system", "content": GEN_SYSTEM},
+                    {
+                        "role": "user",
+                        "content": GEN_USER_TEMPLATE.format(
+                            course=course,
+                            subject=subject.replace("_", " "),
+                            n=args.questions_per_chunk,
+                            excerpt=chunk[: args.chunk_chars],
+                        ),
+                    },
+                ],
+                GenSection,
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"    [warn] chunk {idx} generation failed: {e}")
+            continue
+
+        kp_id = f"{prefix}_kc{idx:02d}"
+        kp = {
+            "id": kp_id,
+            "title": section.knowledge_point.title,
+            "chapter_id": f"c{idx:02d}",
+            "description": section.knowledge_point.description,
+            "summry": section.knowledge_point.summary,  # 'summry' kept for code compat
+        }
+        all_kps.append(kp)
+
+        questions = []
+        for qn, q in enumerate(section.questions, 1):
+            qid = f"{prefix}_q{idx:02d}{qn:02d}"
+            questions.append({
+                "id": qid,
+                "title": q.title,
+                "content": q.content,
+                "difficulty": q.difficulty,
+                "type": q.type,
+                "knowledge_points": [kp_id],
+                "related_questions": [],
+                "reference_answer": {
+                    "content": q.answer,
+                    "key_points": q.key_points,
+                    "explanation": q.explanation,
+                },
+                "chapter": cid,
+            })
+        q_count += len(questions)
+
+        chapters.append({
+            "id": cid,
+            "title": section.chapter_title,
+            "parent_id": "",
+            "order": idx,
+            "description": section.knowledge_point.summary[:300],
+            "knowledge_points": [kp_id],
+            "sub_chapters": [],
+        })
+
+        write_json(out_dir / "questions" / f"ch{idx:02d}.json", questions)
+        write_json(out_dir / "knowledgepoints" / f"ch{idx:02d}.json", [kp])
+        print(f"    chunk {idx}/{len(chunks)}: +1 KP, +{len(questions)} questions")
+
+    write_json(out_dir / "chapters.json", chapters)
+    write_json(out_dir / "knowledgepoints" / "all_knowledgepoints.json", all_kps)
 
     return {
-        "pdf": str(pdf_path),
-        "out_dir": str(out_dir),
-        "pages_extracted": len(pages),
+        "pdf": pdf_path.name,
+        "subject": subject,
+        "status": "ok",
+        "chapters": len(chapters),
+        "knowledge_points": len(all_kps),
+        "questions": q_count,
     }
 
 
-def main():
+# --------------------------------------------------------------------------- #
+# Main
+# --------------------------------------------------------------------------- #
+async def run(args) -> None:
+    try:
+        from src.agents.llm.client import LLMClient
+    except Exception as e:  # noqa: BLE001
+        print(f"[error] cannot import LLM client: {e}")
+        print("Install deps (pip install -r requirements.txt) and run from project root.")
+        sys.exit(1)
+
+    client = LLMClient(model_type=args.model_backend) if args.model_backend else LLMClient()
+    print(f"LLM backend: {client.config.backend} | model: {client.config.model} | {client.config.base_url}")
+
+    courses = ["AP", "IB"] if args.course == "all" else [args.course]
     results = []
-    for course_type in ("AP", "IB"):
-        course_dir = TEXTBOOKS / course_type
+    for course in courses:
+        course_dir = TEXTBOOKS / course
         if not course_dir.exists():
             continue
         for pdf in sorted(course_dir.glob("*.pdf")):
-            results.append(ingest_book(pdf, course_type))
+            print(f"\n=== {course} / {pdf.name} ===")
+            results.append(await ingest_book(client, pdf, course, args))
 
-    manifest = COURSES / "manifest.json"
-    with open(manifest, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+    COURSES.mkdir(parents=True, exist_ok=True)
+    write_json(COURSES / "manifest.json", results)
+    ok = [r for r in results if r.get("status") == "ok"]
+    total_q = sum(r.get("questions", 0) for r in ok)
+    print(f"\nDone. {len(ok)}/{len(results)} books built, {total_q} questions total.")
+    print(f"Manifest: {COURSES / 'manifest.json'}")
 
-    print(f"Ingested {len(results)} books. Manifest: {manifest}")
+
+def parse_args():
+    p = argparse.ArgumentParser(description="Ingest AP/IB textbooks into course bank")
+    p.add_argument("--course", choices=["AP", "IB", "all"], default="all")
+    p.add_argument("--max-chunks", type=int, default=10, help="Max chunks (sections) per book")
+    p.add_argument("--chunk-chars", type=int, default=8000, help="Approx chars per chunk")
+    p.add_argument("--questions-per-chunk", type=int, default=3)
+    p.add_argument("--max-pages", type=int, default=250, help="Max pages to read per book")
+    p.add_argument("--skip-front", type=int, default=8, help="Skip N front-matter pages")
+    p.add_argument("--model-backend", default=None, help="Override EASYEDU_LLM_BACKEND")
+    p.add_argument("--overwrite", action="store_true")
+    return p.parse_args()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(run(parse_args()))

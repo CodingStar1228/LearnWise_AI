@@ -9,5 +9,5 @@ courses/
 └── IB/   # ib 各学科：同上
 ```
 
-> 这些内容需由 ingestion 管线从 `textbooks/` 抽取生成（管线待实现）。
-> 在 AP/IB 数据就绪前，可运行的 demo 仍使用 `data/ds_data/`（旧数据结构数据）。
+由 `scripts/ingest_textbooks.py` 从 `textbooks/` 生成（需模型服务在线，见 `docs/DATA.md` 第 3 节）。
+在 AP/IB 数据生成并接入 loader 前，可运行的 demo 仍使用 `data/ds_data/`（旧数据结构数据）。
