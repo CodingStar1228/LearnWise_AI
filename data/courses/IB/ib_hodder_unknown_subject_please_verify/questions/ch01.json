@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ib_ib_hodder_unknown_subject_please_verify_q01",
+    "title": "Concept check",
+    "content": "Based on the opening of **IB_Hodder_UNKNOWN_SUBJECT_please_verify**, explain one core idea in your own words (Feynman style).\nA. ...\nB. ...\nC. ...\nD. ...",
+    "difficulty": 2,
+    "type": "concept",
+    "knowledge_points": [
+      "ib_ib_hodder_unknown_subject_please_verify_kc01"
+    ],
+    "related_questions": [],
+    "reference_answer": {
+      "content": "Open-ended",
+      "key_points": [
+        "Clear definition",
+        "Example or application"
+      ],
+      "explanation": "Student should articulate the main concept from the textbook opening."
+    },
+    "chapter": "01"
+  }
+]

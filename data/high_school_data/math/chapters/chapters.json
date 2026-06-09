@@ -1,0 +1,74 @@
+[
+    {
+        "id": "m01",
+        "title": "函数与方程",
+        "parent_id": "",
+        "order": 1,
+        "description": "数学 - 函数与方程章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m02",
+        "title": "三角函数",
+        "parent_id": "",
+        "order": 2,
+        "description": "数学 - 三角函数章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m03",
+        "title": "数列",
+        "parent_id": "",
+        "order": 3,
+        "description": "数学 - 数列章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m04",
+        "title": "立体几何",
+        "parent_id": "",
+        "order": 4,
+        "description": "数学 - 立体几何章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m05",
+        "title": "解析几何",
+        "parent_id": "",
+        "order": 5,
+        "description": "数学 - 解析几何章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m06",
+        "title": "概率统计",
+        "parent_id": "",
+        "order": 6,
+        "description": "数学 - 概率统计章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m07",
+        "title": "导数与微积分",
+        "parent_id": "",
+        "order": 7,
+        "description": "数学 - 导数与微积分章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "m08",
+        "title": "复数",
+        "parent_id": "",
+        "order": 8,
+        "description": "数学 - 复数章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    }
+]
