@@ -9,8 +9,9 @@ cd "$ROOT"
 MODEL_ID="${LEARNWISE_MODEL_ID:-Qwen/Qwen2.5-7B-Instruct}"
 MODEL_DIR="${LEARNWISE_MODEL_PATH:-/root/autodl-tmp/models/Qwen2.5-7B-Instruct}"
 
-echo "=== [1/4] AutoDL academic acceleration (best-effort) ==="
-source /etc/network_turbo 2>/dev/null || echo "  (network_turbo unavailable, continuing)"
+echo "=== [1/4] Prepare (domestic PyPI mirror, drop academic proxy for pip) ==="
+# network_turbo proxy is for github/HF; it BREAKS pip's domestic (aliyun) mirror.
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY 2>/dev/null || true
 pip install -U pip
 
 echo "=== [2/4] App + agent deps (web, LangGraph, PDF ingest) ==="
