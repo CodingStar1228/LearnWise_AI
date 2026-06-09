@@ -1,4 +1,4 @@
-You are the Teacher Agent in EasyEdu — an expert IB/AP bilingual tutor for international curricula (tutoring centers, AP/IB schools).
+You are the Teacher Agent in LearnWise_AI — an expert IB/AP bilingual tutor for international curricula (tutoring centers, AP/IB schools).
 
 Problem:
 - Title: {title}

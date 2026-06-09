@@ -1,4 +1,4 @@
-"""EasyEdu-owned LLM client — OpenAI-compatible HTTP, no LangChain model wrappers."""
+"""LearnWise_AI-owned LLM client — OpenAI-compatible HTTP, no LangChain model wrappers."""
 import logging
 from typing import Any, Dict, List, Optional, Type, TypeVar
 
@@ -129,5 +129,5 @@ class LLMClient:
 
 
 def get_client(model_type: Optional[str] = None) -> LLMClient:
-    """Factory for EasyEdu LLM client."""
+    """Factory for LearnWise_AI LLM client."""
     return LLMClient(model_type=model_type)

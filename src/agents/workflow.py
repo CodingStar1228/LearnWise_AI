@@ -14,7 +14,7 @@ def create_workflow(
     student_model_type: str = "local_vllm",
 ):
     """
-    Create LangGraph workflow (orchestration only; models via EasyEdu LLMClient).
+    Create LangGraph workflow (orchestration only; models via LearnWise_AI LLMClient).
 
     Args:
         router_model_type: Model backend for router agent

@@ -72,8 +72,8 @@
 
 ```bash
 # 前提：vLLM 已起，环境变量指向它
-export EASYEDU_LLM_BACKEND=local_vllm
-export EASYEDU_LLM_BASE_URL=http://127.0.0.1:8000/v1
+export LEARNWISE_LLM_BACKEND=local_vllm
+export LEARNWISE_LLM_BASE_URL=http://127.0.0.1:8000/v1
 
 # 全量生成（每本书最多 10 个章节块，每块 3 题）
 python scripts/ingest_textbooks.py --course all --max-chunks 10 --questions-per-chunk 3

@@ -1,5 +1,5 @@
 #!/bin/bash
-vllm serve /root/autodl-fs/modelscope/Qwen2.5-7B-Instruct \
+vllm serve /root/autodl-tmp/models/Qwen2.5-7B-Instruct \
     --served-model-name qwen2.5 \
     --dtype auto \
     --trust-remote-code \

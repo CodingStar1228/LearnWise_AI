@@ -35,7 +35,7 @@ async def knowledge_summry_search(knowledge_points: list) -> str:
 
 
 class TeacherAgent:
-    """教师智能体 — pre-fetches knowledge, then calls EasyEdu LLMClient."""
+    """教师智能体 — pre-fetches knowledge, then calls LearnWise_AI LLMClient."""
 
     def __init__(self, model_type: str = "local_vllm"):
         self.model_type = model_type

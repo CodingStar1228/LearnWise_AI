@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# EasyEdu QLoRA SFT — single RTX 4090 (relative paths, Qwen2.5-7B)
+# LearnWise_AI QLoRA SFT — single RTX 4090 (relative paths, Qwen2.5-7B)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../../../../" && pwd)"
@@ -8,13 +8,13 @@ cd "$ROOT"
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-max_split_size_mb:512}"
 
-LR="${EASYEDU_SFT_LR:-2e-4}"
+LR="${LEARNWISE_SFT_LR:-2e-4}"
 DATESTR="$(date +%Y%m%d-%H%M%S)"
-RUN_NAME="${EASYEDU_SFT_RUN_NAME:-easyedu_feynman}"
-OUTPUT_DIR="${EASYEDU_SFT_OUTPUT:-output/${RUN_NAME}-${DATESTR}}"
-MODEL_PATH="${EASYEDU_MODEL_PATH:-/root/autodl-fs/Qwen/Qwen2.5-7B-Instruct}"
-TRAIN_FILE="${EASYEDU_SFT_TRAIN:-data/rlhf_data/sft/train.jsonl}"
-VAL_FILE="${EASYEDU_SFT_VAL:-data/rlhf_data/sft/val.jsonl}"
+RUN_NAME="${LEARNWISE_SFT_RUN_NAME:-learnwise_feynman}"
+OUTPUT_DIR="${LEARNWISE_SFT_OUTPUT:-output/${RUN_NAME}-${DATESTR}}"
+MODEL_PATH="${LEARNWISE_MODEL_PATH:-/root/autodl-tmp/models/Qwen2.5-7B-Instruct}"
+TRAIN_FILE="${LEARNWISE_SFT_TRAIN:-data/rlhf_data/sft/train.jsonl}"
+VAL_FILE="${LEARNWISE_SFT_VAL:-data/rlhf_data/sft/val.jsonl}"
 
 mkdir -p "$OUTPUT_DIR"
 

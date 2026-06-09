@@ -2,11 +2,11 @@
 # Start self-hosted OpenAI-compatible API via vLLM (AutoDL 4090 / local GPU)
 set -euo pipefail
 
-MODEL_PATH="${EASYEDU_MODEL_PATH:-/root/autodl-fs/Qwen/Qwen2.5-7B-Instruct}"
-HOST="${EASYEDU_VLLM_HOST:-0.0.0.0}"
-PORT="${EASYEDU_VLLM_PORT:-8000}"
-SERVED_NAME="${EASYEDU_LLM_MODEL:-Qwen2.5-7B-Instruct}"
-GPU_MEMORY="${EASYEDU_VLLM_GPU_MEMORY:-0.90}"
+MODEL_PATH="${LEARNWISE_MODEL_PATH:-/root/autodl-tmp/models/Qwen2.5-7B-Instruct}"
+HOST="${LEARNWISE_VLLM_HOST:-0.0.0.0}"
+PORT="${LEARNWISE_VLLM_PORT:-8000}"
+SERVED_NAME="${LEARNWISE_LLM_MODEL:-Qwen2.5-7B-Instruct}"
+GPU_MEMORY="${LEARNWISE_VLLM_GPU_MEMORY:-0.90}"
 
 echo "Model path:    $MODEL_PATH"
 echo "Listen:        $HOST:$PORT"

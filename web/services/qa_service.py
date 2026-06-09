@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 def _model_backend() -> str:
-    return os.getenv("EASYEDU_LLM_BACKEND", get_default_model_backend())
+    return os.getenv("LEARNWISE_LLM_BACKEND", get_default_model_backend())
 
 
 class QAService:

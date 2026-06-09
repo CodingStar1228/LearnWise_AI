@@ -1,4 +1,4 @@
-"""EasyEdu LLM configuration — env-driven, default local vLLM."""
+"""LearnWise_AI LLM configuration — env-driven, default local vLLM."""
 import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
@@ -24,21 +24,21 @@ def get_llm_config(model_type: str | None = None) -> LLMConfig:
     Default backend: local_vllm (self-hosted OpenAI-compatible server).
     Fallback aliases: deepseek, tongyi, qwen2.5 (dev only).
     """
-    backend = model_type or os.getenv("EASYEDU_LLM_BACKEND", "local_vllm")
+    backend = model_type or os.getenv("LEARNWISE_LLM_BACKEND", "local_vllm")
 
     defaults = {
-        "temperature": float(os.getenv("EASYEDU_LLM_TEMPERATURE", "0.7")),
-        "max_tokens": int(os.getenv("EASYEDU_LLM_MAX_TOKENS", "4096")),
-        "timeout": float(os.getenv("EASYEDU_LLM_TIMEOUT", "120")),
-        "max_retries": int(os.getenv("EASYEDU_LLM_MAX_RETRIES", "2")),
+        "temperature": float(os.getenv("LEARNWISE_LLM_TEMPERATURE", "0.7")),
+        "max_tokens": int(os.getenv("LEARNWISE_LLM_MAX_TOKENS", "4096")),
+        "timeout": float(os.getenv("LEARNWISE_LLM_TIMEOUT", "120")),
+        "max_retries": int(os.getenv("LEARNWISE_LLM_MAX_RETRIES", "2")),
     }
 
     if backend == "local_vllm":
         return LLMConfig(
             backend="local_vllm",
-            base_url=os.getenv("EASYEDU_LLM_BASE_URL", "http://127.0.0.1:8000/v1"),
-            api_key=os.getenv("EASYEDU_LLM_API_KEY", "EMPTY"),
-            model=os.getenv("EASYEDU_LLM_MODEL", "Qwen2.5-7B-Instruct"),
+            base_url=os.getenv("LEARNWISE_LLM_BASE_URL", "http://127.0.0.1:8000/v1"),
+            api_key=os.getenv("LEARNWISE_LLM_API_KEY", "EMPTY"),
+            model=os.getenv("LEARNWISE_LLM_MODEL", "Qwen2.5-7B-Instruct"),
             **defaults,
         )
     if backend == "deepseek":
@@ -60,9 +60,9 @@ def get_llm_config(model_type: str | None = None) -> LLMConfig:
     if backend == "qwen2.5":
         return LLMConfig(
             backend="qwen2.5",
-            base_url=os.getenv("QWEN2.5_API_BASE", "http://127.0.0.1:8000/v1"),
-            api_key=os.getenv("EASYEDU_LLM_API_KEY", "EMPTY"),
-            model=os.getenv("EASYEDU_LLM_MODEL", "Qwen2.5-7B-Instruct"),
+            base_url=os.getenv("LEARNWISE_LLM_BASE_URL", "http://127.0.0.1:8000/v1"),
+            api_key=os.getenv("LEARNWISE_LLM_API_KEY", "EMPTY"),
+            model=os.getenv("LEARNWISE_LLM_MODEL", "Qwen2.5-7B-Instruct"),
             **defaults,
         )
 
