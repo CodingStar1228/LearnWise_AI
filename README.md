@@ -1,18 +1,20 @@
-# LearnWise_AI
+# EasyEdu
 
 > 基于费曼学习法的 AI 教学系统 · 面向 IB / AP 国际课程
 > A Feynman-method AI tutoring system for IB / AP curricula
+>
+> **Product**: EasyEdu · **Team / Repo**: LearnWise_AI
 
 **赛事定位 / Competition track**: IAIO — **AI for Business** 赛道。
-LearnWise_AI 把“讲题式学习”包装成一个可面向 K12 国际教育机构（IB/AP 培训学校、留学辅导机构）落地的 B2B 教学产品，核心卖点是**自有模型 + 可私有化部署**。
+EasyEdu 把“讲题式学习”包装成一个可面向 K12 国际教育机构（IB/AP 培训学校、留学辅导机构）落地的 B2B 教学产品，核心卖点是**自有模型 + 可私有化部署**。
 
 ---
 
 ## 1. 这是什么 / What it is
 
-传统 AI 辅导是“学生提问、AI 回答”。LearnWise_AI 反过来：**让学生给 AI 讲题**，由三个智能体协作判断讲解的对错与深浅，并动态决定下一步该“追问”还是“纠错”。这就是费曼学习法（“能教会别人，才算真懂”）的产品化。
+传统 AI 辅导是“学生提问、AI 回答”。EasyEdu 反过来：**让学生给 AI 讲题**，由三个智能体协作判断讲解的对错与深浅，并动态决定下一步该“追问”还是“纠错”。这就是费曼学习法（“能教会别人，才算真懂”）的产品化。
 
-Instead of "student asks, AI answers", LearnWise_AI makes the **student explain the problem to the AI**. Three agents collaborate to judge correctness/depth and decide whether to probe deeper or correct — the Feynman technique, productized.
+Instead of "student asks, AI answers", EasyEdu makes the **student explain the problem to the AI**. Three agents collaborate to judge correctness/depth and decide whether to probe deeper or correct — the Feynman technique, productized.
 
 **三智能体 / Three agents**
 - **Router（路由）** — 评估学生回答，决定下一步走向。

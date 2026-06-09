@@ -11,7 +11,7 @@ python scripts/build_sft_data.py
 
 Format: `input` = message list, `output` = assistant message (see `src/models/rlhf/sft/data_preprocess.py`).
 
-> 现在 `build_sft_data.py` 用的是旧 `data/ds_data` 占位题；AP/IB 真实数据生成后（`scripts/ingest_textbooks.py`）应改成读 `data/courses`。
+> `build_sft_data.py` 会**优先读 `data/courses` 的真实 AP/IB 题库**（`ingest_textbooks.py` 生成），没有则回退 `data/ds_data`。采用**混合策略**：同时学教学行为（router/teacher/student）与学科内容（接地解析），准确率优先。
 
 ## 2. Train
 

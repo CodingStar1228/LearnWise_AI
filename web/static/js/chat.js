@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionId = sessionData.session_id;
             
             // 显示系统欢迎消息
-            addSystemMessage("欢迎来到 LearnWise_AI 智能辅导系统！请为我讲解这道题目吧！");
+            addSystemMessage("欢迎来到 EasyEdu 智能辅导系统！请为我讲解这道题目吧！");
             
         } catch (error) {
             console.error('初始化失败:', error);

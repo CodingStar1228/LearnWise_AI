@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const chapter = chapters.find(c => c.id === chapterId);
             if (chapter) {
                 document.getElementById('chapter-title').textContent = `${chapter.id}. ${chapter.title}`;
-                document.title = `LearnWise_AI - ${chapter.title}`;
+                document.title = `EasyEdu - ${chapter.title}`;
             }
         } catch (error) {
             console.error('加载章节信息失败:', error);
