@@ -1,4 +1,4 @@
-# EasyEdu/scripts/rlhf/evaluate.py
+# LearnWise_AI — src/models/rlhf/sft/evaluate.py
 import json
 import torch
 import argparse

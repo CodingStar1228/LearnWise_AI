@@ -8,7 +8,7 @@ from web.api.endpoints import (
 )
 
 app = FastAPI(
-    title="EasyEdu API",
+    title="LearnWise_AI API",
     description="IB/AP Feynman tutoring API — self-hosted model, multi-agent",
     version="3.0.0",
 )

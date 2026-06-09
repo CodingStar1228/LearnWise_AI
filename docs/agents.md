@@ -199,7 +199,7 @@ async def router_agent(state: State, config) -> Command[Literal["teacher_agent",
     """根据当前状态进行路由"""
     try:
         curr_question = state.question[0]
-        with open("/root/autodl-tmp/EasyEdu/src/agents/prompts/router_agent_prompt.txt", "r", encoding="utf-8") as f:
+        with open("/root/autodl-tmp/LearnWise_AI/src/agents/prompts/router_agent_prompt.txt", "r", encoding="utf-8") as f:
             prompt = f.read()
         prompt = ChatPromptTemplate([
             ("system", prompt),
@@ -233,7 +233,7 @@ async def student_agent(state: State, config) -> State:
     try:
         curr_question = state.question[0]
         evaluation = state.evaluation
-        with open("/root/autodl-tmp/EasyEdu/src/agents/prompts/student_agent_prompt2.txt", "r", encoding="utf-8") as f:
+        with open("/root/autodl-tmp/LearnWise_AI/src/agents/prompts/student_agent_prompt2.txt", "r", encoding="utf-8") as f:
             prompt = f.read()
         prompt = ChatPromptTemplate([
             ("system", prompt),
@@ -262,7 +262,7 @@ async def teacher_agent(state: State, config) -> Command[Literal["tool_node", "_
     try:
         curr_question = state.question[0]
         evaluation = state.evaluation
-        with open("/root/autodl-tmp/EasyEdu/src/agents/prompts/teacher_agent_prompt.txt", "r", encoding="utf-8") as f:
+        with open("/root/autodl-tmp/LearnWise_AI/src/agents/prompts/teacher_agent_prompt.txt", "r", encoding="utf-8") as f:
             prompt = f.read()
         prompt = ChatPromptTemplate([
             ("system", prompt),
@@ -304,7 +304,7 @@ async def teacher_agent(state: State, config) -> Command[Literal["tool_node", "_
 async def knowledge_summry_search(knowledge_points: list):
     """根据知识点列表查询知识点概述"""
     try:
-        system = await KnowledgeIndexSystem.load_indices_async('/root/autodl-tmp/EasyEdu/data/ds_data/ds_indices.pkl')
+        system = await KnowledgeIndexSystem.load_indices_async('/root/autodl-tmp/LearnWise_AI/data/ds_data/ds_indices.pkl')
         knowledge_summry = []
         for kp in knowledge_points:
             knowledge_point_info = await system.get_knowledge_point_async(kp)

@@ -1,4 +1,4 @@
-# EasyEdu/scripts/rlhf/arguments.py
+# LearnWise_AI — src/models/rlhf/sft/arguments.py
 from dataclasses import dataclass, field
 from typing import Optional
 

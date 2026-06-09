@@ -1,4 +1,4 @@
-# EasyEdu/scripts/rlhf/utils.py
+# LearnWise_AI — src/models/rlhf/sft/utils.py
 import gc
 import torch
 # import GPUtil

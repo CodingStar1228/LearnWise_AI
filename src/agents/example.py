@@ -2,7 +2,7 @@
 import sys
 import os
 from dotenv import load_dotenv
-sys.path.append("/root/autodl-tmp/EasyEdu")  # 添加项目根目录
+sys.path.append("/root/autodl-tmp/LearnWise_AI")  # 添加项目根目录
 load_dotenv()
 
 from uuid import uuid4
@@ -12,7 +12,7 @@ from src.agents import create_workflow
 
 async def main():
     # 初始化系统
-    system = KnowledgeIndexSystem.load_indices('/root/autodl-tmp/EasyEdu/data/ds_data/ds_indices.pkl')
+    system = KnowledgeIndexSystem.load_indices('/root/autodl-tmp/LearnWise_AI/data/ds_data/ds_indices.pkl')
     question = system.get_question("q011002")
 
     # 创建工作流

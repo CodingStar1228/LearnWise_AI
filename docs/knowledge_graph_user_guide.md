@@ -1,10 +1,10 @@
 # 知识图谱构建指南
 
-本文档详细介绍了使用EasyEdu框架构建知识图谱的过程、方法和相关配置。
+本文档详细介绍了使用 LearnWise_AI 框架构建知识图谱的过程、方法和相关配置。
 
 ## 1. 概述
 
-知识图谱构建是将非结构化的文本数据转换为结构化的知识网络的过程。在EasyEdu框架中，知识图谱构建分为以下几个阶段：
+知识图谱构建是将非结构化的文本数据转换为结构化的知识网络的过程。在 LearnWise_AI 框架中，知识图谱构建分为以下几个阶段：
 
 1. **提取阶段**：从PDF文档中提取文本内容，并构建领域词典
 2. **处理阶段**：清洗和标准化文本，提取知识点
@@ -49,7 +49,7 @@ docker run \
 确保以下目录已创建：
 
 ```
-/root/autodl-tmp/EasyEdu/
+/root/autodl-tmp/LearnWise_AI/
 ├── config/
 │   └── kg_config.yaml       # 知识图谱配置文件
 ├── data/
@@ -74,7 +74,7 @@ docker run \
 
 ## 3. 配置文件
 
-知识图谱构建的配置文件位于`/root/autodl-tmp/EasyEdu/config/kg_config.yaml`，包含以下主要部分：
+知识图谱构建的配置文件位于`/root/autodl-tmp/LearnWise_AI/config/kg_config.yaml`，包含以下主要部分：
 
 - **基本配置**：项目名称、版本、日志级别等
 - **资源文件配置**：各类资源文件路径

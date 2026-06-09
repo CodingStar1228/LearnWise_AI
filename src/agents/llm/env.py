@@ -3,4 +3,4 @@ import os
 
 
 def get_default_model_backend() -> str:
-    return os.getenv("EASYEDU_LLM_BACKEND", "local_vllm")
+    return os.getenv("LEARNWISE_LLM_BACKEND", "local_vllm")

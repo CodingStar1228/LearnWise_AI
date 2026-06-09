@@ -1,4 +1,4 @@
-# EasyEdu 结构化问题数据库配置
+# LearnWise_AI 结构化问题数据库配置
 
 # 数据库基本配置
 database:
@@ -10,14 +10,14 @@ database:
     mongodb:
       host: "localhost"
       port: 27017
-      database: "EasyEdu"
+      database: "LearnWise_AI"
       # 如果需要认证，取消以下注释
       # username: "user"
       # password: "pass"
       # auth_source: "admin"
     # SQLite 连接信息（备选方案）
     sqlite:
-      path: "./data/EasyEdu.db"
+      path: "./data/LearnWise_AI.db"
   
   # 集合/表名配置
   collections:

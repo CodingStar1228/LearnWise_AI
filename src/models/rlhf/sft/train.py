@@ -1,4 +1,4 @@
-"""EasyEdu SFT — single-GPU QLoRA (4090-friendly), no DeepSpeed ZeRO-3."""
+"""LearnWise_AI SFT — single-GPU QLoRA (4090-friendly), no DeepSpeed ZeRO-3."""
 import os
 
 import torch

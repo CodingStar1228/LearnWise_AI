@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-EasyEdu / LearnWise_AI — AP/IB textbook ingestion pipeline.
+LearnWise_AI — AP/IB textbook ingestion pipeline.
 
 Pipeline:
   1. Extract text from each PDF in textbooks/<AP|IB>/ (PyMuPDF, pdfplumber fallback)
   2. Split into chunks (~chunk_chars each)
   3. For each chunk, call the SELF-HOSTED LLM (via src.agents.llm) to generate
      a knowledge point + several IB/AP bilingual questions as structured JSON
-  4. Write standard EasyEdu schema:
+  4. Write standard LearnWise_AI schema:
        data/courses/<COURSE>/<subject>/chapters.json
        data/courses/<COURSE>/<subject>/questions/ch01.json ...
        data/courses/<COURSE>/<subject>/knowledgepoints/ch01.json ...
        data/courses/<COURSE>/<subject>/knowledgepoints/all_knowledgepoints.json
 
 Run on a machine where the model server is up (see docs/MODEL_SERVING.md):
-    export EASYEDU_LLM_BACKEND=local_vllm
-    export EASYEDU_LLM_BASE_URL=http://127.0.0.1:8000/v1
+    export LEARNWISE_LLM_BACKEND=local_vllm
+    export LEARNWISE_LLM_BASE_URL=http://127.0.0.1:8000/v1
     python scripts/ingest_textbooks.py --course all --max-chunks 10
 
 Requires: pdfplumber or PyMuPDF (in requirements.txt), a running LLM endpoint.
@@ -316,7 +316,7 @@ def parse_args():
     p.add_argument("--questions-per-chunk", type=int, default=3)
     p.add_argument("--max-pages", type=int, default=250, help="Max pages to read per book")
     p.add_argument("--skip-front", type=int, default=8, help="Skip N front-matter pages")
-    p.add_argument("--model-backend", default=None, help="Override EASYEDU_LLM_BACKEND")
+    p.add_argument("--model-backend", default=None, help="Override LEARNWISE_LLM_BACKEND")
     p.add_argument("--overwrite", action="store_true")
     return p.parse_args()
 

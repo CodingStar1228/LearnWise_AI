@@ -1,5 +1,5 @@
 """
-EasyEdu 结构化问题数据库模式定义（高中教学系统版）
+LearnWise_AI 结构化问题数据库模式定义
 """
 
 from typing import List, Dict, Any, Optional, Union

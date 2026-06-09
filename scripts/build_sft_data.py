@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build minimal SFT jsonl from ds_data questions for EasyEdu Feynman tutoring."""
+"""Build minimal SFT jsonl from ds_data questions for LearnWise_AI Feynman tutoring."""
 import json
 import os
 import random
@@ -9,15 +9,15 @@ ROOT = Path(__file__).resolve().parents[1]
 QUESTIONS_DIR = ROOT / "data" / "ds_data" / "questions"
 OUT_DIR = ROOT / "data" / "rlhf_data" / "sft"
 SYSTEM_ROUTER = (
-    "You are the Router Agent in EasyEdu IB/AP Feynman tutoring. "
+    "You are the Router Agent in LearnWise_AI IB/AP Feynman tutoring. "
     "Output ONLY JSON with is_right, is_complete, reason, next_agent."
 )
 SYSTEM_TEACHER = (
-    "You are the Teacher Agent in EasyEdu. Guide the student bilingually (EN+CN), "
+    "You are the Teacher Agent in LearnWise_AI. Guide the student bilingually (EN+CN), "
     "Feynman style — hints before full answers."
 )
 SYSTEM_STUDENT = (
-    "You are the Student Agent in EasyEdu. Ask one deep Socratic question as a peer learner."
+    "You are the Student Agent in LearnWise_AI. Ask one deep Socratic question as a peer learner."
 )
 
 

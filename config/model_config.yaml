@@ -1,4 +1,4 @@
-# EasyEdu model serving defaults (override via env vars)
+# LearnWise_AI model serving defaults (override via env vars)
 default_backend: local_vllm
 
 local_vllm:
@@ -9,7 +9,7 @@ local_vllm:
   max_tokens: 4096
 
 vllm_serve:
-  model_path: /root/autodl-fs/Qwen/Qwen2.5-7B-Instruct
+  model_path: /root/autodl-tmp/models/Qwen2.5-7B-Instruct
   host: 0.0.0.0
   port: 8000
   gpu_memory_utilization: 0.90
