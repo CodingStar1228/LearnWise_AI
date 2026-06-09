@@ -64,13 +64,27 @@
 
 ---
 
-## 3. 最小 ingestion / Minimal ingest
+## 3. 数据生成管线 / Ingestion pipeline
+
+`scripts/ingest_textbooks.py` 是真实管线：**PDF 抽文本 → 分块 → 调自有模型生成「题目+知识点」→ 存标准 JSON**。
+
+⚠️ 必须在「模型服务已启动」的机器上运行（见 `docs/MODEL_SERVING.md`），因为第 2 步要调 LLM 读教材出题。本地 Mac 没有 PDF 库 / 模型，跑不了。
 
 ```bash
-python scripts/ingest_textbooks.py
+# 前提：vLLM 已起，环境变量指向它
+export EASYEDU_LLM_BACKEND=local_vllm
+export EASYEDU_LLM_BASE_URL=http://127.0.0.1:8000/v1
+
+# 全量生成（每本书最多 10 个章节块，每块 3 题）
+python scripts/ingest_textbooks.py --course all --max-chunks 10 --questions-per-chunk 3
+
+# 只做 AP / 调参 / 覆盖重建
+python scripts/ingest_textbooks.py --course AP --max-chunks 20 --overwrite
 ```
 
-从 `textbooks/AP`、`textbooks/IB` 抽取前几页文本，生成 `data/courses/<AP|IB>/<subject>/` 脚手架（chapters、knowledgepoints、questions）。详见 `data/courses/manifest.json`。
+产出：`data/courses/<AP|IB>/<subject>/`（`chapters.json` + `questions/chNN.json` + `knowledgepoints/chNN.json` + `all_knowledgepoints.json`），并写 `data/courses/manifest.json` 统计每本书生成了多少题。
+
+参数：`--max-pages` 限制读取页数，`--chunk-chars` 每块字符数，`--skip-front` 跳过前言页。
 
 ---
 
