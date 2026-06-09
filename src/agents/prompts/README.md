@@ -6,4 +6,5 @@
 | `teacher_agent_prompt.txt` | Teacher | Uses `{knowledge_context}` pre-fetched in code |
 | `student_agent_prompt2.txt` | Student | Socratic peer learner, IB/AP bilingual |
 
+Product brand in prompts: **EasyEdu** (team/repo: LearnWise_AI).
 Legacy Chinese data-structure prompts are in `student_agent_prompt.txt` (unused).

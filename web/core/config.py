@@ -7,7 +7,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 class Settings(BaseModel):
     """应用配置"""
     API_V1_STR: str = "/api"
-    PROJECT_NAME: str = "LearnWise_AI"
+    PROJECT_NAME: str = "EasyEdu"
     
     # 路径配置
     BASE_DIR: str = ROOT_DIR
