@@ -41,26 +41,26 @@ app.include_router(questions_extended.router, prefix="/api", tags=["questions_ex
 
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 @app.get("/problems")
 async def problems_page(request: Request):
-    return templates.TemplateResponse("problems.html", {"request": request})
+    return templates.TemplateResponse(request, "problems.html")
 
 @app.get("/knowledge")
 async def knowledge_page(request: Request):
-    return templates.TemplateResponse("knowledge.html", {"request": request})
+    return templates.TemplateResponse(request, "knowledge.html")
 
 @app.get("/chat/{question_id}")
 async def chat_view(request: Request, question_id: str):
-    return templates.TemplateResponse("chat.html", {"request": request, "question_id": question_id})
+    return templates.TemplateResponse(request, "chat.html", {"question_id": question_id})
 
 @app.get("/upload")
 async def upload_page(request: Request):
     """文件上传页面"""
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return templates.TemplateResponse(request, "upload.html")
 
 @app.get("/flashcards")
 async def flashcards_page(request: Request):
     """抽认卡学习页面"""
-    return templates.TemplateResponse("flashcards.html", {"request": request})
+    return templates.TemplateResponse(request, "flashcards.html")

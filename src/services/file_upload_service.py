@@ -11,10 +11,16 @@ from typing import List, Dict, Optional
 from pathlib import Path
 from datetime import datetime
 
-# 导入PDF提取器
+# PDF 提取器：懒加载，避免在没有 PyMuPDF/PaddleOCR 的机器上（如本地 Mac）import 失败
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from data.ds_data.data_processing.pdf_extractor import PDFExtractor
+try:
+    from data.ds_data.data_processing.pdf_extractor import PDFExtractor
+    PDF_EXTRACTOR_AVAILABLE = True
+except Exception:
+    PDFExtractor = None
+    PDF_EXTRACTOR_AVAILABLE = False
+    print("警告: PDFExtractor 不可用（缺少 PyMuPDF/pdfplumber 等依赖），PDF 提取功能将不可用")
 
 try:
     from paddleocr import PaddleOCR
@@ -129,6 +135,10 @@ class FileUploadService:
         file_type = file_info["file_type"]
         
         if file_type == "pdf":
+            if not PDF_EXTRACTOR_AVAILABLE:
+                raise RuntimeError(
+                    "PDF 提取依赖未安装（PyMuPDF/pdfplumber）。请在带这些依赖的环境运行，或安装后重试。"
+                )
             # 使用PDFExtractor
             output_dir = self.upload_dir / file_info["id"]
             output_dir.mkdir(exist_ok=True)
