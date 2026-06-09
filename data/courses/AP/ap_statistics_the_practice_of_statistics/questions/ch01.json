@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ap_ap_statistics_the_practice_of_statistics_q01",
+    "title": "Concept check",
+    "content": "Based on the opening of **AP_Statistics_The_Practice_of_Statistics**, explain one core idea in your own words (Feynman style).\nA. ...\nB. ...\nC. ...\nD. ...",
+    "difficulty": 2,
+    "type": "concept",
+    "knowledge_points": [
+      "ap_ap_statistics_the_practice_of_statistics_kc01"
+    ],
+    "related_questions": [],
+    "reference_answer": {
+      "content": "Open-ended",
+      "key_points": [
+        "Clear definition",
+        "Example or application"
+      ],
+      "explanation": "Student should articulate the main concept from the textbook opening."
+    },
+    "chapter": "01"
+  }
+]

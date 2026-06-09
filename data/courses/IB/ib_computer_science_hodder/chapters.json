@@ -1,0 +1,13 @@
+[
+  {
+    "id": "01",
+    "title": "IB_Computer_Science_Hodder",
+    "parent_id": "",
+    "order": 1,
+    "description": "Placeholder for IB_Computer_Science_Hodder.pdf",
+    "knowledge_points": [
+      "ib_ib_computer_science_hodder_kc01"
+    ],
+    "sub_chapters": []
+  }
+]

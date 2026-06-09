@@ -1,0 +1,74 @@
+[
+    {
+        "id": "e01",
+        "title": "语法基础",
+        "parent_id": "",
+        "order": 1,
+        "description": "英语 - 语法基础章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e02",
+        "title": "时态语态",
+        "parent_id": "",
+        "order": 2,
+        "description": "英语 - 时态语态章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e03",
+        "title": "从句",
+        "parent_id": "",
+        "order": 3,
+        "description": "英语 - 从句章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e04",
+        "title": "词汇",
+        "parent_id": "",
+        "order": 4,
+        "description": "英语 - 词汇章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e05",
+        "title": "阅读理解",
+        "parent_id": "",
+        "order": 5,
+        "description": "英语 - 阅读理解章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e06",
+        "title": "完形填空",
+        "parent_id": "",
+        "order": 6,
+        "description": "英语 - 完形填空章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e07",
+        "title": "写作",
+        "parent_id": "",
+        "order": 7,
+        "description": "英语 - 写作章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    },
+    {
+        "id": "e08",
+        "title": "听力",
+        "parent_id": "",
+        "order": 8,
+        "description": "英语 - 听力章节内容",
+        "knowledge_points": [],
+        "sub_chapters": []
+    }
+]

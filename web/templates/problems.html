@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyEdu - 题目练习</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- 添加Marked.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- 固定导航栏 -->
+    <nav class="fixed-nav">
+        <div class="nav-logo">EasyEdu · IB/AP</div>
+        <div class="nav-links">
+            <a href="/" class="nav-item">首页</a>
+            <a href="/problems" class="nav-item active">题目练习</a>
+            <a href="/knowledge" class="nav-item">知识点速记</a>
+            <a href="/upload" class="nav-item">上传题目</a>
+            <a href="/flashcards" class="nav-item">抽认卡</a>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="content-wrapper">
+            <div class="subject-panel">
+                <h2>选择科目</h2>
+                <select id="subject-select" class="subject-select">
+                    <option value="">全部科目</option>
+                </select>
+            </div>
+            
+            <div class="chapter-panel">
+                <h2>章节列表</h2>
+                <ul id="chapter-list" class="list-panel"></ul>
+            </div>
+            
+            <div class="questions-panel">
+                <h2>题目列表 <span id="current-chapter-title"></span></h2>
+                <div id="question-list" class="list-panel">
+                    <p class="empty-tip">请选择科目和章节查看题目</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .subject-panel {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .subject-select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        .chapter-panel {
+            flex: 0 0 300px;
+        }
+    </style>
+    
+    <script src="/static/js/problems.js"></script>
+</body>
+</html> 
