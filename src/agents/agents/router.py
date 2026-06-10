@@ -29,7 +29,7 @@ class Evaluation(TypedDict):
 
 
 class RouterAgent:
-    """路由智能体 — uses LearnWise_AI LLMClient + JSON parsing (no function calling)."""
+    """路由：让模型直接吐 JSON，我们自己解析校验，不依赖 function calling。"""
 
     def __init__(self, model_type: str = "local_vllm"):
         self.model_type = model_type

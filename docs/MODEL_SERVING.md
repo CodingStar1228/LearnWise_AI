@@ -1,39 +1,32 @@
-# Model serving / 模型自部署
+# 模型部署
 
-LearnWise_AI defaults to **self-hosted** inference via an OpenAI-compatible API (`local_vllm`).
+EasyEdu 默认连一个我们自己用 vLLM 起的、兼容 OpenAI 协议的模型服务（`local_vllm`），不走商业 API。
 
-## Quick start (AutoDL 4090)
+## 起服务（AutoDL 4090）
 
 ```bash
-# 1. Install vLLM on GPU machine
 pip install vllm
-
-# 2. Set model path (download Qwen2.5-7B-Instruct to this path)
 export LEARNWISE_MODEL_PATH=/root/autodl-tmp/models/Qwen2.5-7B-Instruct
-
-# 3. Start server
-chmod +x scripts/serve_model_vllm.sh
 ./scripts/serve_model_vllm.sh
 ```
 
-Server listens at `http://0.0.0.0:8000/v1`.
+起来后监听在 `http://0.0.0.0:8000/v1`。
 
-## Connect LearnWise_AI Web / agents
+## 让网页/智能体连上它
 
-On the machine running FastAPI (same host or remote):
+在跑 FastAPI 的那台机器上（本机或远程都行）设好这几个变量再起网页：
 
 ```bash
 export LEARNWISE_LLM_BACKEND=local_vllm
 export LEARNWISE_LLM_BASE_URL=http://127.0.0.1:8000/v1
 export LEARNWISE_LLM_MODEL=Qwen2.5-7B-Instruct
 export LEARNWISE_LLM_API_KEY=EMPTY
-
 bash run_web.sh
 ```
 
-## After fine-tuning (LearnWise LoRA)
+## 换成微调后的模型
 
-Merge LoRA into base weights or point vLLM at merged checkpoint:
+把 LoRA 合并进基座，或者直接让 vLLM 指向训练产物，然后改一下模型路径重启：
 
 ```bash
 export LEARNWISE_MODEL_PATH=/root/autodl-tmp/LearnWise_AI/output/learnwise-merged
@@ -41,16 +34,18 @@ export LEARNWISE_LLM_MODEL=LearnWise-7B-Feynman
 ./scripts/serve_model_vllm.sh
 ```
 
-## Fallback (dev only)
+## 兜底：开发期可以临时用商业 API
+
+本地没显卡、只想调代码的时候，可以临时切到商业 API：
 
 ```bash
 export LEARNWISE_LLM_BACKEND=deepseek
 export DEEPSEEK_API_KEY=sk-...
 ```
 
-Commercial APIs are fallbacks; competition demo should use `local_vllm`.
+但比赛 demo 一定要用 `local_vllm`，跑自己的模型才是重点。
 
-## Health check
+## 检查服务活没活
 
 ```bash
 curl -s "$LEARNWISE_LLM_BASE_URL/models" | head

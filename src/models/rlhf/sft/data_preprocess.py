@@ -1,4 +1,4 @@
-"""SFT data pipeline — Qwen chat template via tokenizer.apply_chat_template."""
+"""把 jsonl 对话数据按 Qwen 的 chat template 处理成训练样本。"""
 import json
 from typing import Any, Dict, List, Optional, Tuple
 

@@ -1,4 +1,4 @@
-"""LearnWise_AI SFT — single-GPU QLoRA (4090-friendly), no DeepSpeed ZeRO-3."""
+"""单卡 QLoRA 微调（4090 够用），不上 DeepSpeed。"""
 import os
 
 import torch

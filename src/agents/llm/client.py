@@ -1,4 +1,4 @@
-"""LearnWise_AI-owned LLM client — OpenAI-compatible HTTP, no LangChain model wrappers."""
+"""我们自己的 LLM 客户端：httpx 直连 OpenAI 兼容端点，不套 LangChain 的模型封装。"""
 import logging
 from typing import Any, Dict, List, Optional, Type, TypeVar
 

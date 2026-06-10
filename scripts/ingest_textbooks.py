@@ -1,24 +1,18 @@
 #!/usr/bin/env python3
 """
-LearnWise_AI — AP/IB textbook ingestion pipeline.
+把 AP/IB 教材变成题库。
 
-Pipeline:
-  1. Extract text from each PDF in textbooks/<AP|IB>/ (PyMuPDF, pdfplumber fallback)
-  2. Split into chunks (~chunk_chars each)
-  3. For each chunk, call the SELF-HOSTED LLM (via src.agents.llm) to generate
-     a knowledge point + several IB/AP bilingual questions as structured JSON
-  4. Write standard LearnWise_AI schema:
-       data/courses/<COURSE>/<subject>/chapters.json
-       data/courses/<COURSE>/<subject>/questions/ch01.json ...
-       data/courses/<COURSE>/<subject>/knowledgepoints/ch01.json ...
-       data/courses/<COURSE>/<subject>/knowledgepoints/all_knowledgepoints.json
+流程：从 textbooks/<AP|IB>/ 的每个 PDF 抽文本（优先 PyMuPDF，退而求其次
+pdfplumber）→ 按字数切块 → 每块调我们自己部署的模型，生成一个知识点和几道
+中英双语题目（结构化 JSON）→ 写成标准格式存到 data/courses/<课程>/<学科>/ 下
+（chapters.json、questions/、knowledgepoints/）。
 
-Run on a machine where the model server is up (see docs/MODEL_SERVING.md):
+要在模型服务起着的机器上跑（见 docs/MODEL_SERVING.md），因为出题这步要调模型：
     export LEARNWISE_LLM_BACKEND=local_vllm
     export LEARNWISE_LLM_BASE_URL=http://127.0.0.1:8000/v1
     python scripts/ingest_textbooks.py --course all --max-chunks 10
 
-Requires: pdfplumber or PyMuPDF (in requirements.txt), a running LLM endpoint.
+依赖 pdfplumber 或 PyMuPDF，外加一个在线的模型端点。
 """
 import argparse
 import asyncio
