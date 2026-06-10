@@ -1,39 +1,38 @@
-# EasyEdu Business Case — IAIO AI for Business
+# EasyEdu — 商业思路 / Business case
 
-> Product: **EasyEdu** · Team: **LearnWise_AI**
+Product: EasyEdu · Team: LearnWise_AI · Track: IAIO "AI for Business"
 
-## Target customers
-- IB/AP tutoring centers and international schools
-- Study-abroad agencies offering structured subject coaching
-- B2B edtech platforms needing white-label AI tutoring
+## 卖给谁
 
-## Problem
-- Generic chatbots answer questions but do not improve deep understanding
-- Commercial LLM APIs: cost scales with usage, data leaves the institution, little customization
-- Teachers lack scalable tools for "explain the problem" classroom practice
+主要是做 IB/AP 的培训机构、国际学校，还有那些帮学生备考的留学辅导机构。再往外一点，是想做 AI 辅导但不想从零搭的 edtech 平台——我们可以给他们一套能贴牌的方案。
 
-## Solution — EasyEdu
-- **Feynman loop**: student explains → Router evaluates → Student probes or Teacher corrects/summarizes
-- **Own model stack**: QLoRA fine-tune on 4090 + vLLM self-hosting (`docs/MODEL_SERVING.md`, `docs/TRAINING.md`)
-- **IB/AP content path**: textbook ingestion → structured course bank (`scripts/ingest_textbooks.py`)
-- **Bilingual**: English-first AP/IB terms + Chinese support for mixed classrooms
+这些机构有个共同点：学生多、老师贵、而且很在意自己的教学数据和题库。
 
-## Why it wins for business
-| Dimension | Commercial API tutor | EasyEdu |
-|-----------|---------------------|---------|
-| Cost | Per-token, grows with seats | Fixed GPU + optional API fallback |
-| Data | Third-party cloud | On-prem / private cloud |
-| Pedagogy | Q&A | Explain-to-learn + multi-agent |
-| Curriculum | Generic | AP/IB textbooks → custom bank |
+## 痛点
 
-## Demo flow (competition)
-1. Select course / chapter / problem
-2. Student explains solution in chat
-3. Show Router JSON decision (optional debug)
-4. Student or Teacher agent responds bilingually
-5. Highlight: runs on **your** model endpoint (`LEARNWISE_LLM_BACKEND=local_vllm`)
+通用聊天机器人能答题，但学生“看懂了答案”不等于“真的学会了”。机构真正缺的是能规模化的“讲题式”练习——以前这只能靠老师一对一盯着。
 
-## Go-to-market (light)
-- Pilot with one AP subject (e.g. Statistics) + one IB subject (Math AA HL)
-- Package: software + model weights + ingestion for institution's licensed textbooks
-- Metrics: session completion, explanation depth (router `is_complete`), teacher time saved
+如果直接接商业大模型 API，又有三个绕不开的问题：按 token 付费，用得越多越贵；学生数据要发到第三方云上；几乎没法按自己的课程深度定制。
+
+## 我们的做法
+
+EasyEdu 把费曼学习法做成了一个闭环：学生讲题 → Router 判断讲得怎么样 → 要么 Student 追问、要么 Teacher 纠错或总结。
+
+关键是模型是我们自己的。在一张 4090 上用 QLoRA 微调，再用 vLLM 自己部署（见 [`MODEL_SERVING.md`](MODEL_SERVING.md)、[`TRAINING.md`](TRAINING.md)）。题库也是自己的——把机构买了版权的 IB/AP 教材喂给 [`ingest_textbooks.py`](../scripts/ingest_textbooks.py)，自动生成结构化题库。反馈是中英双语的，照顾国际课程里中英混合的课堂。
+
+## 为什么这套对机构更划算
+
+| | 接商业 API 的辅导 | EasyEdu |
+|---|---|---|
+| 成本 | 按 token，随人数涨 | 固定一张卡，API 只做兜底 |
+| 数据 | 在第三方云 | 留在机构自己手里 |
+| 教学方式 | 一问一答 | 讲题式 + 多智能体 |
+| 课程内容 | 通用 | 用机构自己的 AP/IB 教材定制 |
+
+## 比赛 demo 怎么演
+
+选课程和题目 → 学生在对话框里讲解 → （可选）把 Router 判断的 JSON 亮出来给评委看决策过程 → Student/Teacher 用中英双语回应。最后强调一句：这整套跑在我们自己的模型端点上（`LEARNWISE_LLM_BACKEND=local_vllm`），不依赖任何外部 API。
+
+## 落地节奏
+
+先拿一门 AP（比如 Statistics）加一门 IB（Math AA HL）做试点。卖给机构的是一个打包：软件 + 模型权重 + 针对他们自己教材的题库生成。效果就看几个数：学生有没有把一次讲解走完、讲解的深度（Router 的 `is_complete`）、以及帮老师省了多少时间。

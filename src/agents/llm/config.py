@@ -1,4 +1,4 @@
-"""LearnWise_AI LLM configuration — env-driven, default local vLLM."""
+"""LLM 配置，全部从环境变量读，默认连本地 vLLM。"""
 import os
 from dataclasses import dataclass
 from dotenv import load_dotenv

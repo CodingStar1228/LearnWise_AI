@@ -13,13 +13,9 @@ def create_workflow(
     teacher_model_type: str = "local_vllm",
     student_model_type: str = "local_vllm",
 ):
-    """
-    Create LangGraph workflow (orchestration only; models via LearnWise_AI LLMClient).
+    """搭好 LangGraph 工作流。这里只管编排，模型调用都走自有的 LLM 客户端。
 
-    Args:
-        router_model_type: Model backend for router agent
-        teacher_model_type: Model backend for teacher agent
-        student_model_type: Model backend for student agent
+    三个 *_model_type 分别指定 router/teacher/student 用哪个模型后端。
     """
     workflow = StateGraph(State)
 

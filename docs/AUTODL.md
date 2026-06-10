@@ -1,21 +1,21 @@
-# 在 AutoDL 上运行 LearnWise_AI / Running on AutoDL
+# 在 AutoDL 上跑起来
 
-手把手：从连接 4090 到跑通模型 + 网页 + 训练。
+从连上 4090 到把模型、网页、训练都跑通的完整流程。
 
-## 1. 连接到 4090
+## 1. 进到 4090 的终端
 
-1. AutoDL 控制台点 **开机**。
-2. 控制台「SSH登录」会给一条命令，形如：
-   ```bash
-   ssh -p 12345 root@region-x.autodl.com   # 密码也在控制台
-   ```
-   在你 Mac 的终端里运行它登录。
-3. 用数据盘目录（关机不丢数据）：
-   ```bash
-   cd /root/autodl-tmp
-   ```
+实例得先是「运行中」。进终端有两个办法：
 
-## 2. 一键安装（拉代码 + 依赖 + 模型）
+- **JupyterLab（最省事）**：控制台 → 容器实例 → 你那台的「快捷工具」列点 JupyterLab，新标签页里 File → New → Terminal，就是 4090 上的终端。
+- **SSH**：控制台「SSH登录」里复制那条 `ssh -p 端口 root@...`，在自己电脑的终端里跑，提示输密码时把控制台的密码粘进去（输密码时不显示，正常）。
+
+代码和模型都放数据盘，关机不丢：
+
+```bash
+cd /root/autodl-tmp
+```
+
+## 2. 装环境
 
 ```bash
 source /etc/network_turbo
@@ -24,20 +24,22 @@ cd LearnWise_AI
 bash scripts/setup_autodl.sh
 ```
 
-`setup_autodl.sh` 会：装 `requirements.txt` + GPU 栈（vllm/peft/bitsandbytes 等）+ 用 ModelScope 下载 Qwen2.5-7B 到 `/root/autodl-tmp/models/`。
+脚本分四步：装网页和智能体依赖 → 装 vLLM（会顺带把 torch 升级到新版，正常）→ 装训练依赖 → 用 ModelScope 把 Qwen2.5-7B 下到 `/root/autodl-tmp/models/`。整个十几二十分钟，看到最后打印 `Done` 就成了。
 
-## 3. 单卡分时使用（重要）
+> 踩过的坑：`network_turbo` 那个代理是给 github/HF 用的，pip 走国内镜像时反而会被它挡住（报 `No matching distribution`）。脚本里已经在装包前把代理关掉了，不用管。
 
-24GB 显存放不下「同时服务 + 训练」。要么服务、要么训练。
+## 3. 一张卡，分时用
 
-### A. 起自有模型服务
+24GB 显存装不下「一边服务一边训练」。所以是：要么在跑模型服务，要么在训练，二选一。
+
+跑模型（占住这个终端，监听 8000）：
 
 ```bash
 export LEARNWISE_MODEL_PATH=/root/autodl-tmp/models/Qwen2.5-7B-Instruct
-./scripts/serve_model_vllm.sh        # 占用 GPU，监听 :8000
+./scripts/serve_model_vllm.sh
 ```
 
-### B. 启动网页（新开一个 SSH 终端）
+再开一个终端跑网页：
 
 ```bash
 cd /root/autodl-tmp/LearnWise_AI
@@ -47,16 +49,16 @@ export LEARNWISE_WEB_PORT=6006
 bash run_web.sh
 ```
 
-## 4. 在浏览器看网页（两种方式）
+## 4. 在浏览器打开网页
 
-- **方式一（推荐）AutoDL 自定义服务**：网页跑在 `6006` 端口，控制台开「自定义服务」会给一个公网地址，直接点开。
-- **方式二 SSH 端口转发**：在你 Mac 终端：
-  ```bash
-  ssh -p 12345 -L 6006:127.0.0.1:6006 root@region-x.autodl.com
-  ```
-  然后本地浏览器开 `http://127.0.0.1:6006`。
+两种方式：
 
-## 5. 生成 AP/IB 数据集（模型在线时）
+- AutoDL 控制台开「自定义服务」，它固定映射 6006 端口，会给你一个公网地址（所以网页一定要跑在 6006）。
+- 或者从自己电脑做端口转发：`ssh -p 端口 -L 6006:127.0.0.1:6006 root@...`，然后本地浏览器开 `http://127.0.0.1:6006`。
+
+## 5. 生成 AP/IB 题库（模型在线时）
+
+教材 PDF 太大没进 git，得先自己传到 `textbooks/AP`、`textbooks/IB`（AutoDL 文件上传或 scp 都行），然后：
 
 ```bash
 export LEARNWISE_LLM_BACKEND=local_vllm
@@ -64,18 +66,19 @@ export LEARNWISE_LLM_BASE_URL=http://127.0.0.1:8000/v1
 python scripts/ingest_textbooks.py --course all --max-chunks 10
 ```
 
-> 注意：`textbooks/` 里的 PDF 是 gitignored 的，不会随 git 同步。要在 AutoDL 上生成数据，需先把 PDF 上传到 `textbooks/AP|IB/`（用 AutoDL 文件上传或 scp）。
+## 6. 训练自己的模型
 
-## 6. 训练自有模型
+训练前先 `Ctrl+C` 把 vLLM 停了，把显存让出来：
 
 ```bash
-# 先 Ctrl+C 停掉 vLLM 腾出显存
 python scripts/build_sft_data.py
 bash src/models/rlhf/sft/train.sh
-# 产物在 output/learnwise_feynman-<时间戳>/
+# 结果在 output/learnwise_feynman-<时间戳>/
 ```
 
-## 7. 用训练好的模型上线
+3 轮、几千条样本，4090 上大概 1.5~3 小时。想先快速验证就把轮数改成 1。
+
+## 7. 换上训练好的模型
 
 ```bash
 export LEARNWISE_MODEL_PATH=/root/autodl-tmp/LearnWise_AI/output/learnwise_feynman-XXXX
@@ -83,8 +86,9 @@ export LEARNWISE_LLM_MODEL=LearnWise-7B-Feynman
 ./scripts/serve_model_vllm.sh
 ```
 
-## 常见问题
+## 卡住了看这里
 
-- **vllm 装不上 / CUDA 不匹配**：确认实例镜像是 PyTorch 2.x + CUDA 12.x；不行就在控制台换镜像。
-- **下模型慢**：`setup_autodl.sh` 用的是 ModelScope（国内快）。
-- **端口打不开**：AutoDL 自定义服务固定用 6006，确保 `LEARNWISE_WEB_PORT=6006`。
+- vLLM 装不上、CUDA 对不上：确认镜像是 PyTorch 2.x + CUDA 12.x，不行就在控制台换镜像。
+- 下模型慢：用的是 ModelScope，已经是国内最快的了，15GB 耐心等。
+- 网页打不开：自定义服务只认 6006，确认 `LEARNWISE_WEB_PORT=6006`。
+- 长任务怕断连：用 `screen` 或 `tmux` 开后台，SSH 断了也不影响。

@@ -11,7 +11,7 @@ PROMPTS_DIR = os.path.join(os.path.dirname(CURRENT_DIR), "prompts")
 
 
 class StudentAgent:
-    """学生智能体 — Socratic peer learner via LearnWise_AI LLMClient."""
+    """学生：扮演一个爱追问的同学，用苏格拉底式提问把学生逼深一点。"""
 
     def __init__(self, model_type: str = "local_vllm"):
         self.model_type = model_type

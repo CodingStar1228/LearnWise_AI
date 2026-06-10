@@ -1,4 +1,4 @@
-"""JSON extraction and validation for router structured output."""
+"""从模型输出里把 JSON 抠出来并校验，给 router 的结构化输出用。"""
 import json
 import re
 from typing import Any, Dict, Optional, Type, TypeVar
