@@ -6,58 +6,55 @@ from typing import Dict, List, Optional, Any, Tuple
 
 from langchain_core.messages import HumanMessage
 
-from data.ds_data.data_processing.index_builder import KnowledgeIndexSystem
-from data.high_school_data_loader import HighSchoolDataLoader
+from data.courses_loader import CoursesDataLoader
 from src.agents.workflow import create_workflow
 from src.agents.llm.env import get_default_model_backend
 
 # 获取项目根目录
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DS_INDICES_PATH = os.path.join(ROOT_DIR, "data", "ds_data", "ds_indices.pkl")
-HS_INDICES_PATH = os.path.join(ROOT_DIR, "data", "hs_indices.pkl")
+COURSES_DIR = os.path.join(ROOT_DIR, "data", "courses")
+COURSES_INDICES_PATH = os.path.join(COURSES_DIR, "courses_indices.pkl")
 
 class KnowledgeQASystem:
     """知识问答系统，整合知识点索引和智能体问答功能"""
     
     def __init__(self, 
-                 indices_path: str = DS_INDICES_PATH,
+                 indices_path: str = None,
                  use_high_school_data: bool = True,
                  router_model_type: Optional[str] = None,
                  teacher_model_type: Optional[str] = None,
                  student_model_type: Optional[str] = None):
         """
-        初始化知识问答系统
-        
+        初始化知识问答系统（只用 AP/IB 题库 data/courses）。
+
         Args:
-            indices_path: 索引文件路径（用于旧数据结构）
-            use_high_school_data: 是否使用高中教学系统数据
+            indices_path: 兼容旧签名，已不使用
+            use_high_school_data: 兼容旧签名，已不使用
             router_model_type: 路由模型类型
             teacher_model_type: 教师模型类型
             student_model_type: 学生模型类型
         """
-        self.use_high_school_data = use_high_school_data
-        
-        # 加载数据系统
-        if use_high_school_data:
-            # 尝试加载高中数据
-            if os.path.exists(HS_INDICES_PATH):
-                try:
-                    self.index_system = HighSchoolDataLoader.load_indices(HS_INDICES_PATH)
-                    print("✅ 已加载高中教学系统数据")
-                except Exception as e:
-                    print(f"⚠️  加载高中数据失败: {e}，尝试重新加载...")
-                    self.index_system = HighSchoolDataLoader()
-                    self.index_system.load_all_subjects()
-                    self.index_system.save_indices(HS_INDICES_PATH)
-            else:
-                # 首次运行，加载并保存
-                self.index_system = HighSchoolDataLoader()
+        # 这两个标志已废弃，保留参数只为兼容旧调用。题库统一走 data/courses。
+        self.use_high_school_data = True
+
+        # 加载 AP/IB 题库：有缓存用缓存，否则现读现存
+        if os.path.exists(COURSES_INDICES_PATH):
+            try:
+                self.index_system = CoursesDataLoader.load_indices(COURSES_INDICES_PATH)
+                print("✅ 已加载 AP/IB 题库")
+            except Exception as e:
+                print(f"⚠️  加载题库缓存失败: {e}，重新读取 data/courses ...")
+                self.index_system = CoursesDataLoader()
                 self.index_system.load_all_subjects()
-                self.index_system.save_indices(HS_INDICES_PATH)
+                self.index_system.save_indices(COURSES_INDICES_PATH)
         else:
-            # 使用原有数据结构
-            self.index_system = KnowledgeIndexSystem.load_indices(indices_path)
-        
+            self.index_system = CoursesDataLoader()
+            self.index_system.load_all_subjects()
+            try:
+                self.index_system.save_indices(COURSES_INDICES_PATH)
+            except Exception as e:
+                print(f"⚠️  题库索引缓存写入失败（不影响运行）: {e}")
+
         # 创建智能体工作流（默认 self-hosted local_vllm）
         default_backend = get_default_model_backend()
         self.workflow = create_workflow(

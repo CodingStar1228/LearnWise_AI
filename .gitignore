@@ -47,6 +47,11 @@ data/exports/*
 !data/uploads/.gitkeep
 !data/exports/.gitkeep
 
+# AP/IB 题库（在 GPU 机器上由 ingest_textbooks.py 生成）+ 索引缓存
+data/courses/**
+!data/courses/README.md
+data/courses/courses_indices.pkl
+
 # 旧抽取数据（已归档，体积大）
 legacy/data/DS2026_extracted/
 
