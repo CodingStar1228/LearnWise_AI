@@ -7,25 +7,40 @@ from langgraph.types import Command
 
 from ..base import State
 from ..models import get_llm
-from data.ds_data.data_processing.index_builder import KnowledgeIndexSystem
+from data.courses_loader import CoursesDataLoader
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPTS_DIR = os.path.join(os.path.dirname(CURRENT_DIR), "prompts")
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(CURRENT_DIR)))
-DS_INDICES_PATH = os.path.join(ROOT_DIR, "data", "ds_data", "ds_indices.pkl")
+COURSES_DIR = os.path.join(ROOT_DIR, "data", "courses")
+COURSES_INDICES_PATH = os.path.join(COURSES_DIR, "courses_indices.pkl")
+
+# 题库加载一次后缓存，避免每次回答都重读
+_KP_LOADER: CoursesDataLoader | None = None
+
+
+def _get_loader() -> CoursesDataLoader:
+    global _KP_LOADER
+    if _KP_LOADER is None:
+        if os.path.exists(COURSES_INDICES_PATH):
+            _KP_LOADER = CoursesDataLoader.load_indices(COURSES_INDICES_PATH)
+        else:
+            _KP_LOADER = CoursesDataLoader()
+            _KP_LOADER.load_all_subjects()
+    return _KP_LOADER
 
 
 async def knowledge_summry_search(knowledge_points: list) -> str:
-    """Fetch knowledge point summaries (Python-side, no model tool calling)."""
+    """从 AP/IB 题库取知识点摘要（Python 侧查好，不靠模型发工具调用）。"""
     try:
-        system = await KnowledgeIndexSystem.load_indices_async(DS_INDICES_PATH)
+        loader = _get_loader()
         knowledge_summry = []
         for kp in knowledge_points:
-            knowledge_point_info = await system.get_knowledge_point_async(kp)
-            if knowledge_point_info:
+            kp_info = loader.get_knowledge_point(kp)
+            if kp_info:
                 knowledge_summry.append({
-                    "knowledge_point": knowledge_point_info["title"],
-                    "summry": knowledge_point_info["summry"],
+                    "knowledge_point": kp_info.get("title", ""),
+                    "summry": kp_info.get("summry", ""),
                 })
         if knowledge_summry:
             return "\n".join([f"{kp['knowledge_point']}: {kp['summry']}" for kp in knowledge_summry])

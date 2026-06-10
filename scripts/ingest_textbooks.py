@@ -208,6 +208,7 @@ async def ingest_book(client, pdf_path: Path, course: str, args) -> dict:
                     },
                 ],
                 GenSection,
+                max_tokens=args.gen_max_tokens,
             )
         except Exception as e:  # noqa: BLE001
             print(f"    [warn] chunk {idx} generation failed: {e}")
@@ -306,8 +307,10 @@ def parse_args():
     p = argparse.ArgumentParser(description="Ingest AP/IB textbooks into course bank")
     p.add_argument("--course", choices=["AP", "IB", "all"], default="all")
     p.add_argument("--max-chunks", type=int, default=10, help="Max chunks (sections) per book")
-    p.add_argument("--chunk-chars", type=int, default=8000, help="Approx chars per chunk")
+    p.add_argument("--chunk-chars", type=int, default=6000, help="Approx chars per chunk")
     p.add_argument("--questions-per-chunk", type=int, default=3)
+    p.add_argument("--gen-max-tokens", type=int, default=2048,
+                   help="Max tokens to generate per chunk (keep prompt+gen under the server's --max-model-len)")
     p.add_argument("--max-pages", type=int, default=250, help="Max pages to read per book")
     p.add_argument("--skip-front", type=int, default=8, help="Skip N front-matter pages")
     p.add_argument("--model-backend", default=None, help="Override LEARNWISE_LLM_BACKEND")

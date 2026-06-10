@@ -7,10 +7,12 @@ HOST="${LEARNWISE_VLLM_HOST:-0.0.0.0}"
 PORT="${LEARNWISE_VLLM_PORT:-8000}"
 SERVED_NAME="${LEARNWISE_LLM_MODEL:-Qwen2.5-7B-Instruct}"
 GPU_MEMORY="${LEARNWISE_VLLM_GPU_MEMORY:-0.90}"
+MAX_LEN="${LEARNWISE_VLLM_MAX_LEN:-8192}"
 
 echo "Model path:    $MODEL_PATH"
 echo "Listen:        $HOST:$PORT"
 echo "Served name:   $SERVED_NAME"
+echo "Max model len: $MAX_LEN"
 
 python -m vllm.entrypoints.openai.api_server \
   --model "$MODEL_PATH" \
@@ -19,4 +21,4 @@ python -m vllm.entrypoints.openai.api_server \
   --port "$PORT" \
   --dtype auto \
   --gpu-memory-utilization "$GPU_MEMORY" \
-  --max-model-len 4096
+  --max-model-len "$MAX_LEN"
