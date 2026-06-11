@@ -485,20 +485,63 @@ document.addEventListener('DOMContentLoaded', function() {
             return rendered;
         };
         
-        // 使用增强的Markdown渲染标题和内容
-        let html = `<div class="question-title">${questionData.title}</div>`;
-        html += `<div class="question-content">${renderMarkdown(questionData.content)}</div>`;
-        
-        if (questionData.options) {
-            html += '<div class="options">';
-            for (const key in questionData.options) {
-                // 选项也用增强的Markdown渲染
-                html += `<div class="option"><span>${key}.</span> <div class="option-content">${renderMarkdown(questionData.options[key])}</div></div>`;
+        // 解析选项：优先用结构化 options 字段，否则从题干文本里抽出 A./B./C./D.
+        let stem = questionData.content || '';
+        let options = [];
+
+        if (questionData.options && Object.keys(questionData.options).length) {
+            options = Object.keys(questionData.options).map(k => ({ key: k, text: questionData.options[k] }));
+        } else {
+            const lines = stem.split('\n');
+            const optionRegex = /^\s*([A-Z])[.、)]\s*(.+)$/;
+            const stemLines = [];
+            let started = false;
+            lines.forEach(line => {
+                const m = line.match(optionRegex);
+                if (m) {
+                    started = true;
+                    options.push({ key: m[1], text: m[2].trim() });
+                } else if (!started) {
+                    stemLines.push(line);
+                } else if (line.trim() && options.length) {
+                    // 选项的续行，拼到上一个选项
+                    options[options.length - 1].text += ' ' + line.trim();
+                }
+            });
+            // 只有确实抽到了选项，才把它们从题干里剥离
+            if (options.length) {
+                stem = stemLines.join('\n');
             }
+        }
+
+        // 使用增强的Markdown渲染标题和题干
+        let html = `<div class="question-title">${questionData.title}</div>`;
+        html += `<div class="question-content">${renderMarkdown(stem)}</div>`;
+
+        if (options.length) {
+            html += '<div class="mcq-options">';
+            options.forEach(opt => {
+                html += `<button type="button" class="mcq-option" data-key="${opt.key}">`
+                      + `<span class="mcq-key">${opt.key}</span>`
+                      + `<span class="mcq-text">${opt.text}</span></button>`;
+            });
             html += '</div>';
         }
-        
+
         detailDiv.innerHTML = html;
+
+        // 选项可点击：选中后高亮，并把答案填入输入框，引导学生讲解（费曼）
+        detailDiv.querySelectorAll('.mcq-option').forEach(btn => {
+            btn.addEventListener('click', () => {
+                detailDiv.querySelectorAll('.mcq-option').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                const input = document.getElementById('user-input');
+                if (input) {
+                    input.value = `我选 ${btn.dataset.key}，因为`;
+                    input.focus();
+                }
+            });
+        });
         
         // 处理题目中可能包含的数学公式
         if (window.MathJax) {

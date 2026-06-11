@@ -65,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
-            subjects = data.subjects || [];
+            // /api/subjects 返回的是数组；兼容旧的 {subjects:[...]} 形式
+            subjects = Array.isArray(data) ? data : (data.subjects || []);
             
             // 填充科目选择器
             subjects.forEach(subject => {

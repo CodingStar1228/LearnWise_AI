@@ -641,6 +641,65 @@
             color: #1e40af;
         }
         
+        /* 可点击选择题选项 */
+        .mcq-options {
+            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mcq-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            width: 100%;
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #1f2937;
+            transition: all 0.15s;
+        }
+
+        .mcq-option:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+
+        .mcq-option.selected {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+        }
+
+        .mcq-key {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #1e40af;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .mcq-option.selected .mcq-key {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .mcq-text {
+            flex: 1;
+            line-height: 1.4;
+        }
+
         /* 题目选项容器样式 */
         .option {
             display: flex;
@@ -740,7 +799,7 @@
 <body>
     <!-- 固定导航栏 -->
     <nav class="fixed-nav">
-        <div class="nav-logo">高中教学智能系统</div>
+        <div class="nav-logo">EasyEdu · IB/AP</div>
         <div class="nav-links">
             <a href="/" class="nav-item">首页</a>
             <a href="/problems" class="nav-item active">题目练习</a>
@@ -766,11 +825,6 @@
                     </div>
                 </div>
                 <div class="sidebar-section">
-                    <h2>题目详情</h2>
-                    <div id="question-detail" class="question-detail-box"></div>
-                </div>
-
-
                     <h2>题目详情</h2>
                     <div id="question-detail" class="question-detail-box"></div>
                 </div>
