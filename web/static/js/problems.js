@@ -1,3 +1,27 @@
+// 难度：数字(1-5)或中文 -> {label, cls}
+function formatDifficulty(d) {
+    if (typeof d === 'number') {
+        if (d <= 2) return { label: '简单', cls: 'easy' };
+        if (d >= 4) return { label: '困难', cls: 'hard' };
+        return { label: '中等', cls: 'medium' };
+    }
+    if (d === '简单') return { label: '简单', cls: 'easy' };
+    if (d === '困难') return { label: '困难', cls: 'hard' };
+    return { label: d || '中等', cls: 'medium' };
+}
+
+// 题型英文 -> 中文展示
+function formatType(t) {
+    const map = {
+        'concept': '概念题',
+        'calculation': '计算题',
+        'application': '应用题',
+        'multiple-choice': '选择题',
+        'mcq': '选择题',
+    };
+    return map[t] || t || '题目';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // 存储数据
     let chapters = [];
@@ -88,11 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderChapters() {
         chapterList.innerHTML = '';
         
-        chapters.forEach(chapter => {
+        chapters.forEach((chapter, idx) => {
             const li = document.createElement('li');
             li.className = 'chapter-item';
             li.dataset.id = chapter.id;
-            li.textContent = `${chapter.id}. ${chapter.title}`;
+            li.textContent = `${idx + 1}. ${chapter.title}`;
             
             li.addEventListener('click', () => selectChapter(chapter));
             
@@ -157,24 +181,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const div = document.createElement('div');
             div.className = 'question-item';
             
-            // 添加难度标签类
-            let difficultyClass = 'medium';
-            if (question.difficulty === '简单') {
-                difficultyClass = 'easy';
-            } else if (question.difficulty === '困难') {
-                difficultyClass = 'hard';
-            }
+            // 难度：支持数字(1-5)或中文字符串，统一映射为 易/中/难
+            const { label: difficultyLabel, cls: difficultyClass } = formatDifficulty(question.difficulty);
+            const typeLabel = formatType(question.type);
             
             // 使用Markdown渲染标题
-            const titleHTML = marked.parse(question.title);
+            const titleHTML = marked.parse(question.title || '');
             // 去除<p>标签以保持样式一致性
             const formattedTitle = titleHTML.replace(/<\/?p>/g, '');
             
             div.innerHTML = `
                 <div class="title">${formattedTitle}</div>
                 <div class="meta">
-                    <span>${question.type}</span>
-                    <span class="difficulty ${difficultyClass}">${question.difficulty}</span>
+                    <span>${typeLabel}</span>
+                    <span class="difficulty ${difficultyClass}">${difficultyLabel}</span>
                 </div>
             `;
             

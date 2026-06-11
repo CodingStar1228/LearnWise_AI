@@ -23,15 +23,12 @@
     
     <div class="main-container">
         <div class="content-wrapper">
-            <div class="subject-panel">
+            <div class="chapter-panel">
                 <h2>选择科目</h2>
                 <select id="subject-select" class="subject-select">
                     <option value="">全部科目</option>
                 </select>
-            </div>
-            
-            <div class="chapter-panel">
-                <h2>章节列表</h2>
+                <h2 class="panel-subtitle">章节列表</h2>
                 <ul id="chapter-list" class="list-panel"></ul>
             </div>
             
@@ -45,25 +42,17 @@
     </div>
     
     <style>
-        .subject-panel {
-            padding: 20px;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
-        }
         .subject-select {
             width: 100%;
             padding: 10px;
-            font-size: 16px;
+            font-size: 15px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-top: 10px;
+            background: #fff;
         }
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
-        .chapter-panel {
-            flex: 0 0 300px;
+        .panel-subtitle {
+            margin-top: 20px;
         }
     </style>
     

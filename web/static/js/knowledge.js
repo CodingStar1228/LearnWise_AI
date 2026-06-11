@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderChapters() {
         chapterList.innerHTML = '';
         
-        chapters.forEach(chapter => {
+        chapters.forEach((chapter, idx) => {
             const li = document.createElement('li');
             li.className = 'chapter-item';
             li.dataset.id = chapter.id;
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 添加章节标题和折叠图标
             const titleSpan = document.createElement('span');
             titleSpan.className = 'chapter-title';
-            titleSpan.textContent = `${chapter.id}. ${chapter.title}`;
+            titleSpan.textContent = `${idx + 1}. ${chapter.title}`;
             
             const icon = document.createElement('i');
             icon.className = 'fas fa-chevron-right chapter-icon';
@@ -233,20 +233,13 @@ document.addEventListener('DOMContentLoaded', function() {
             div.className = 'knowledge-item';
             div.dataset.id = kpId;
             
-            // 获取知识点标题（如果存在）
+            // 获取知识点标题（如果存在），只显示干净标题，不暴露内部ID
             let kpTitle = knowledgeDetails[kpId] ? knowledgeDetails[kpId].title : "";
-            
-            // 创建知识点ID和标题元素
-            const idSpan = document.createElement('span');
-            idSpan.className = 'knowledge-id';
-            idSpan.textContent = kpId;
             
             const titleDiv = document.createElement('div');
             titleDiv.className = 'knowledge-title-text';
-            titleDiv.textContent = kpTitle;
+            titleDiv.textContent = kpTitle || '知识点';
             
-            // 组合ID和标题
-            div.appendChild(idSpan);
             div.appendChild(titleDiv);
             
             // 点击知识点显示详情
@@ -288,11 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 kpDetail.title = await getKnowledgeTitle(knowledgeId);
             }
             
-            // 显示加载中
-            knowledgeTitle.innerHTML = `<span class="knowledge-id-label">${kpDetail.id}</span>`;
-            if (kpDetail.title) {
-                knowledgeTitle.innerHTML += ` - <span class="knowledge-title-label">${kpDetail.title}</span>`;
-            }
+            // 只显示干净的知识点标题，不暴露内部ID
+            knowledgeTitle.innerHTML = `<span class="knowledge-title-label">${kpDetail.title || '知识点'}</span>`;
             
             knowledgeSummary.innerHTML = '<div style="text-align: center; padding: 20px;">加载中...</div>';
             
