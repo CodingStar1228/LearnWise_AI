@@ -6,7 +6,7 @@ from langchain_core.messages import AIMessage, SystemMessage
 from langgraph.types import Command
 
 from ..base import State
-from ..models import get_llm
+from ..models import get_llm, stream_or_chat
 from data.courses_loader import CoursesDataLoader
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -38,6 +38,8 @@ async def knowledge_summry_search(knowledge_points: list) -> str:
         for kp in knowledge_points:
             kp_info = loader.get_knowledge_point(kp)
             if kp_info:
+                # 注意：字段名 "summry" 是历史拼写错误（应为 summary），数据与代码都依赖它，
+                # 改动需同时迁移题库数据，故暂保留。见 docs/DATA.md。
                 knowledge_summry.append({
                     "knowledge_point": kp_info.get("title", ""),
                     "summry": kp_info.get("summry", ""),
@@ -85,7 +87,7 @@ class TeacherAgent:
             messages.extend(state.messages)
 
             client = get_llm(model_type=self.model_type)
-            content = await client.chat(messages)
+            content = await stream_or_chat(client, messages, "teacher_agent")
 
             return Command(
                 update={"messages": AIMessage(content=content)},

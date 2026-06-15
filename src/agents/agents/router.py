@@ -52,7 +52,8 @@ class RouterAgent:
             messages.extend(state.messages)
 
             client = get_llm(model_type=self.model_type)
-            result = await client.chat_json(messages, EvaluationSchema)
+            # 路由是"对/错/完整性"的结构化判断，用低温度让评估和 JSON 输出更稳定
+            result = await client.chat_json(messages, EvaluationSchema, temperature=0.2)
 
             router_result: Evaluation = {
                 "is_right": result.is_right,

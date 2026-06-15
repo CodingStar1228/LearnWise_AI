@@ -200,8 +200,10 @@ class KnowledgeQASystem:
         }
         
         print("开始处理回答...")
-        async for msg, metadata in self.workflow.astream(inputs, config, stream_mode="messages"):
-            yield msg.content, metadata['langgraph_node']
+        # 用 custom 流：teacher/student 通过 stream writer 逐 token 推送 {node, content}
+        async for chunk in self.workflow.astream(inputs, config, stream_mode="custom"):
+            if isinstance(chunk, dict) and "content" in chunk:
+                yield chunk["content"], chunk.get("node", "")
         
 
     def get_session_info(self, session_id: str) -> Dict:

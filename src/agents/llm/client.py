@@ -1,6 +1,7 @@
 """我们自己的 LLM 客户端：httpx 直连 OpenAI 兼容端点，不套 LangChain 的模型封装。"""
+import json
 import logging
-from typing import Any, Dict, List, Optional, Type, TypeVar
+from typing import Any, AsyncIterator, Dict, List, Optional, Type, TypeVar
 
 import httpx
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -12,6 +13,16 @@ from .json_utils import parse_and_validate
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound=BaseModel)
+
+# 复用一个进程级 httpx 客户端，避免每次请求都新建连接（连接池 + keep-alive）。
+_shared_client: Optional[httpx.AsyncClient] = None
+
+
+def _http() -> httpx.AsyncClient:
+    global _shared_client
+    if _shared_client is None or _shared_client.is_closed:
+        _shared_client = httpx.AsyncClient()
+    return _shared_client
 
 
 def messages_to_api(messages: List[BaseMessage]) -> List[Dict[str, str]]:
@@ -98,6 +109,52 @@ class LLMClient:
             f"Failed to parse JSON from model output. Last response: {text2[:500]}"
         )
 
+    async def chat_stream(
+        self,
+        messages: List[Dict[str, str]] | List[BaseMessage],
+        temperature: Optional[float] = None,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncIterator[str]:
+        """逐 token 流式返回（OpenAI 兼容 SSE）。失败时抛错，调用方自行兜底。"""
+        if messages and isinstance(messages[0], BaseMessage):
+            api_messages = messages_to_api(messages)
+        else:
+            api_messages = list(messages)
+
+        payload = {
+            "model": self.config.model,
+            "messages": api_messages,
+            "temperature": temperature if temperature is not None else self.config.temperature,
+            "max_tokens": max_tokens if max_tokens is not None else self.config.max_tokens,
+            "stream": True,
+        }
+        url = self.config.base_url.rstrip("/") + "/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.config.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        async with _http().stream(
+            "POST", url, json=payload, headers=headers, timeout=self.config.timeout
+        ) as resp:
+            resp.raise_for_status()
+            async for line in resp.aiter_lines():
+                if not line or not line.startswith("data:"):
+                    continue
+                data = line[len("data:"):].strip()
+                if data == "[DONE]":
+                    break
+                try:
+                    obj = json.loads(data)
+                except json.JSONDecodeError:
+                    continue
+                choices = obj.get("choices") or []
+                if not choices:
+                    continue
+                delta = (choices[0].get("delta") or {}).get("content")
+                if delta:
+                    yield delta
+
     async def _post_chat(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         url = self.config.base_url.rstrip("/") + "/chat/completions"
         headers = {
@@ -108,10 +165,9 @@ class LLMClient:
         last_err: Optional[Exception] = None
         for attempt in range(self.config.max_retries + 1):
             try:
-                async with httpx.AsyncClient(timeout=self.config.timeout) as client:
-                    resp = await client.post(url, json=payload, headers=headers)
-                    resp.raise_for_status()
-                    return resp.json()
+                resp = await _http().post(url, json=payload, headers=headers, timeout=self.config.timeout)
+                resp.raise_for_status()
+                return resp.json()
             except (httpx.HTTPError, httpx.TimeoutException) as e:
                 last_err = e
                 logger.warning("LLM request attempt %s failed: %s", attempt + 1, e)

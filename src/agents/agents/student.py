@@ -4,7 +4,7 @@ import os
 from langchain_core.messages import AIMessage, SystemMessage
 
 from ..base import State
-from ..models import get_llm
+from ..models import get_llm, stream_or_chat
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROMPTS_DIR = os.path.join(os.path.dirname(CURRENT_DIR), "prompts")
@@ -39,7 +39,7 @@ class StudentAgent:
             messages.extend(state.messages)
 
             client = get_llm(model_type=self.model_type)
-            content = await client.chat(messages)
+            content = await stream_or_chat(client, messages, "student_agent")
 
             return {"messages": AIMessage(content=content)}
 
