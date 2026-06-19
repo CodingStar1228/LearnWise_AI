@@ -136,18 +136,48 @@ def _extract_pdfplumber(pdf_path: Path, max_pages: int) -> List[str]:
     return pages
 
 
+_FRONT_MATTER_PATTERNS = [
+    r"about\s+the\s+author",
+    r"acknowledgment",
+    r"preface",
+    r"foreword",
+    r"table\s+of\s+contents",
+    r"list\s+of\s+(figure|table)",
+    r"copyright",
+    r"dedication",
+    r"committee\s+work",
+    r"about\s+college\s+board",
+    r"about\s+the\s+college\s+board",
+]
+_FRONT_MATTER_RE = re.compile(
+    "|".join(_FRONT_MATTER_PATTERNS), re.IGNORECASE
+)
+_MIN_BODY_WORDS = 120  # chunks with fewer words are likely front/back matter
+
+
+def _is_front_matter(text: str) -> bool:
+    """Return True if the chunk looks like front or back matter, not body content."""
+    if len(text.split()) < _MIN_BODY_WORDS:
+        return True
+    # If the first 400 chars are dominated by front-matter keywords, skip
+    sample = text[:400]
+    return bool(_FRONT_MATTER_RE.search(sample))
+
+
 def chunk_pages(pages: List[str], chunk_chars: int, skip_front: int) -> List[str]:
-    """Group pages into ~chunk_chars text blocks; skip front matter pages."""
+    """Group pages into ~chunk_chars text blocks; skip front matter pages and
+    any chunk that looks like acknowledgments / author bios / ToC."""
     body = pages[skip_front:] if skip_front < len(pages) else pages
     chunks: List[str] = []
     buf = ""
     for page in body:
         if len(buf) + len(page) > chunk_chars and buf:
-            chunks.append(buf)
+            if not _is_front_matter(buf):
+                chunks.append(buf)
             buf = page
         else:
             buf += "\n" + page
-    if buf.strip():
+    if buf.strip() and not _is_front_matter(buf):
         chunks.append(buf)
     return chunks
 

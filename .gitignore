@@ -66,3 +66,6 @@ output/
 
 # Office lock files
 ~$*
+
+# Deliverables (Word/PPT exports, not tracked in git)
+deliverables/

@@ -108,15 +108,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // 禁用发送按钮
         const sendBtn = document.getElementById('send-btn');
         sendBtn.disabled = true;
-        sendBtn.textContent = '思考中...';
+        sendBtn.textContent = '发送';
+
+        // 显示 thinking indicator
+        const thinkingEl = addThinkingIndicator();
         
         try {
             // 通过SSE接收流式响应
             const url = `/api/sessions/${sessionId}/messages`;
             const eventSource = new EventSource(`${url}?content=${encodeURIComponent(message)}&_t=${Date.now()}`);
             
-            console.log("创建SSE连接:", url);
-            
+            let firstToken = true;
+
             // 初始化智能体消息内容
             let studentContent = '';
             let teacherContent = '';
@@ -125,6 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 监听消息事件
             eventSource.onmessage = function(event) {
+                if (firstToken) {
+                    firstToken = false;
+                    removeThinkingIndicator(thinkingEl);
+                }
                 try {
                     const data = JSON.parse(event.data);
                     const content = data.content;
@@ -152,9 +159,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 监听结束事件
             eventSource.addEventListener('end', function() {
-                console.log("SSE连接结束");
                 eventSource.close();
-                // 恢复发送按钮
+                removeThinkingIndicator(thinkingEl);
                 sendBtn.disabled = false;
                 sendBtn.textContent = '发送';
             });
@@ -163,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
             eventSource.onerror = function(error) {
                 console.error('SSE错误:', error);
                 eventSource.close();
-                // 恢复发送按钮
+                removeThinkingIndicator(thinkingEl);
                 sendBtn.disabled = false;
                 sendBtn.textContent = '发送';
                 addSystemMessage("接收消息出错，请重试。");
@@ -171,11 +177,47 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('发送消息失败:', error);
-            // 恢复发送按钮
+            removeThinkingIndicator(thinkingEl);
             sendBtn.disabled = false;
             sendBtn.textContent = '发送';
             addSystemMessage("发送消息失败，请重试。");
         }
+    }
+
+    function addThinkingIndicator() {
+        const container = document.getElementById('chat-messages');
+        const el = document.createElement('div');
+        el.className = 'message-item thinking-item';
+        el.innerHTML = `
+            <div class="message-container">
+                <div class="message-content">
+                    <div class="avatar" style="background:#e0f2fe">
+                        <svg class="avatar-icon" style="color:#0284c7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="thinking-indicator">
+                            <div class="dots">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            <span class="thinking-label">正在评估你的回答...</span>
+                        </div>
+                        <div class="thinking-bar"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.appendChild(el);
+        scrollToBottom();
+        return el;
+    }
+
+    function removeThinkingIndicator(el) {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
     }
     
     // 更新或创建消息

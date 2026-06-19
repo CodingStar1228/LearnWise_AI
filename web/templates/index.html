@@ -1,184 +1,96 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyEdu - IB/AP AI Feynman Tutor</title>
+    <title>EasyEdu — IB/AP Tutoring</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1a202c; background: #fff; }
+        .page-wrap { max-width: 860px; margin: 0 auto; padding: 80px 24px 60px; }
+
+        /* hero */
+        .hero { text-align: center; padding: 48px 0 40px; border-bottom: 1px solid #e8ecf0; }
+        .hero h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 12px; }
+        .hero h1 span { color: #2563eb; }
+        .hero p { font-size: 1.05rem; color: #4a5568; max-width: 540px; margin: 0 auto 20px; line-height: 1.65; }
+        .hero-cta { display: inline-block; background: #2563eb; color: #fff; padding: 11px 28px; border-radius: 6px; font-weight: 600; font-size: 0.95rem; text-decoration: none; }
+        .hero-cta:hover { background: #1d4ed8; }
+
+        /* how it works */
+        .section { padding: 48px 0 8px; }
+        .section-title { font-size: 1.25rem; font-weight: 700; margin: 0 0 28px; color: #111; }
+
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .step { background: #f8fafc; border: 1px solid #e8ecf0; border-radius: 8px; padding: 22px 20px; }
+        .step-num { font-size: 0.78rem; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .step h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }
+        .step p { font-size: 0.88rem; color: #64748b; line-height: 1.6; margin: 0; }
+
+        /* subjects */
+        .subjects { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+        .subject-tag { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 5px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+
+        /* nav override */
+        .nav-logo { font-size: 1.05rem; font-weight: 700; }
+    </style>
 </head>
-<body class="bg-gradient-to-b from-white to-blue-50/30">
-    <!-- 固定导航栏 -->
-    <nav class="fixed-nav bg-white shadow-sm w-full">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center py-3">
-            <div class="nav-logo font-bold">EasyEdu · IB/AP Tutor</div>
-            <div class="nav-links">
-                <a href="/" class="nav-item active px-3 py-2 text-blue-600 font-medium">首页</a>
-                <a href="/problems" class="nav-item px-3 py-2 text-gray-700 hover:text-blue-600">题目练习</a>
-                <a href="/knowledge" class="nav-item px-3 py-2 text-gray-700 hover:text-blue-600">知识点速记</a>
-                <a href="/upload" class="nav-item px-3 py-2 text-gray-700 hover:text-blue-600">上传题目</a>
-                <a href="/flashcards" class="nav-item px-3 py-2 text-gray-700 hover:text-blue-600">抽认卡</a>
-            </div>
+<body>
+    <nav class="fixed-nav">
+        <div class="nav-logo">EasyEdu</div>
+        <div class="nav-links">
+            <a href="/" class="nav-item active">Home</a>
+            <a href="/problems" class="nav-item">Practice</a>
+            <a href="/knowledge" class="nav-item">Knowledge</a>
+            <a href="/upload" class="nav-item">Upload</a>
+            <a href="/flashcards" class="nav-item">Flashcards</a>
         </div>
     </nav>
-    
-    <div class="flex flex-col min-h-screen">
-        <div class="max-w-7xl mx-auto px-4 py-6 space-y-8 pt-16">
-            <!-- Hero Section -->
-            <section class="text-center max-w-3xl mx-auto border-b pb-6">
-                <h1 class="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
-                    <span class="text-blue-600">EasyEdu</span> — IB/AP AI Feynman Tutor for Business
-                </h1>
-                <p class="text-lg text-gray-700 mb-3 leading-relaxed">
-                    面向国际课程教培机构 · 自研多智能体 + 可私有化部署模型 · 中英双语费曼学习
-                </p>
-                <p class="text-sm text-gray-600 mb-2">
-                    Self-hosted LLM · Router / Student / Teacher agents · Explain-to-learn, not ask-to-answer
-                </p>
-                <p class="text-sm text-blue-600 font-medium inline-block border border-blue-200 rounded-full px-4 py-1 bg-blue-50">
-                    点击导航栏的<span class="font-bold">"题目练习"</span>开始您的学习之旅
-                </p>
-            </section>
 
-            <!-- Introduction -->
-            <section class="max-w-3xl mx-auto text-center">
-                <h2 class="text-2xl font-bold text-gray-900 mb-3 inline-block border-b-2 border-blue-300 pb-1">
-                    智能教学新体验
-                </h2>
-                <p class="text-base text-gray-700 leading-relaxed">
-                    EasyEdu 为 IB/AP 培训学校与留学辅导机构设计：学生向 AI 讲题，三智能体评估并引导。
-                    支持私有化部署自有模型，降低 API 成本，保护课堂数据。Bilingual EN/CN feedback for international curricula.
-                </p>
-            </section>
+    <div class="page-wrap">
 
-            <!-- Features Section -->
-            <section>
-                <h2 class="text-2xl font-bold text-center text-gray-900 mb-5 inline-block border-b-2 border-blue-300 pb-1">
-                    系统特色
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        <div class="py-3 px-4 border-b">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-100 p-2 rounded-full">
-                                    <i data-lucide="brain" class="w-5 h-5 text-blue-600"></i>
-                                </div>
-                                <h3 class="text-base font-semibold">三层智能体模型</h3>
-                            </div>
-                        </div>
-                        <div class="py-2 px-4">
-                            <p class="text-xs text-gray-600 leading-relaxed">
-                                路由Agent评估回答，学生Agent进行知识点追问，教师Agent提供纠错指导
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        <div class="py-3 px-4 border-b">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-100 p-2 rounded-full">
-                                    <i data-lucide="lightbulb" class="w-5 h-5 text-blue-600"></i>
-                                </div>
-                                <h3 class="text-base font-semibold">费曼学习法</h3>
-                            </div>
-                        </div>
-                        <div class="py-2 px-4">
-                            <p class="text-xs text-gray-600 leading-relaxed">
-                                主动讲解加深理解，发现知识盲点，建立完整知识体系
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        <div class="py-3 px-4 border-b">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-100 p-2 rounded-full">
-                                    <i data-lucide="rotate-cw" class="w-5 h-5 text-blue-600"></i>
-                                </div>
-                                <h3 class="text-base font-semibold">动态教学路径</h3>
-                            </div>
-                        </div>
-                        <div class="py-2 px-4">
-                            <p class="text-xs text-gray-600 leading-relaxed">
-                                系统根据您的表现实时调整教学策略，提供个性化学习体验
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        <div class="py-3 px-4 border-b">
-                            <div class="flex items-center gap-3">
-                                <div class="bg-blue-100 p-2 rounded-full">
-                                    <i data-lucide="check-circle" class="w-5 h-5 text-blue-600"></i>
-                                </div>
-                                <h3 class="text-base font-semibold">覆盖 IB / AP 课程</h3>
-                            </div>
-                        </div>
-                        <div class="py-2 px-4">
-                            <p class="text-xs text-gray-600 leading-relaxed">
-                                覆盖 AP Statistics / Physics / CSP、IB Biology / Computer Science / Math AA HL，题库由教材原文生成
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- How It Works Section -->
-            <section>
-                <h2 class="text-2xl font-bold text-center text-gray-900 mb-5 inline-block border-b-2 border-blue-300 pb-1">
-                    使用指南
-                </h2>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center text-center">
-                        <div class="bg-blue-100 p-2 rounded-full mb-3">
-                            <i data-lucide="book-open" class="h-5 w-5 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-base font-semibold mb-2">题目练习</h3>
-                        <p class="text-xs text-gray-700 leading-relaxed">浏览按 IB/AP 科目与章节分类的题目，选择您想学习的内容</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center text-center">
-                        <div class="bg-blue-100 p-2 rounded-full mb-3">
-                            <i data-lucide="message-square" class="h-5 w-5 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-base font-semibold mb-2">主动讲解</h3>
-                        <p class="text-xs text-gray-700 leading-relaxed">尝试自己讲解题目的解题思路，系统将评估您的表现</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center text-center">
-                        <div class="bg-blue-100 p-2 rounded-full mb-3">
-                            <i data-lucide="rotate-cw" class="h-5 w-5 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-base font-semibold mb-2">智能反馈</h3>
-                        <p class="text-xs text-gray-700 leading-relaxed">获得智能体个性化指导，纠正错误，填补知识空缺</p>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow flex flex-col items-center text-center">
-                        <div class="bg-blue-100 p-2 rounded-full mb-3">
-                            <i data-lucide="brain" class="h-5 w-5 text-blue-600"></i>
-                        </div>
-                        <h3 class="text-base font-semibold mb-2">知识速记</h3>
-                        <p class="text-xs text-gray-700 leading-relaxed">随时查阅关键知识点，构建完整的知识体系</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CTA Section -->
-            <section class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-5 text-center max-w-3xl mx-auto">
-                <h2 class="text-xl font-bold text-gray-900 mb-3">开始您的学习之旅</h2>
-                <p class="text-sm text-gray-700 leading-relaxed">
-                    点击导航栏的<span class="font-bold text-blue-600">"题目练习"</span>，
-                    选择一道题目，尝试讲解您的解题思路，体验费曼学习法的魅力！
-                    您还可以上传PDF或图片自动提取题目，或使用抽认卡进行复习。
-                </p>
-            </section>
+        <div class="hero">
+            <h1><span>EasyEdu</span> — IB / AP Tutoring</h1>
+            <p>
+                Instead of giving you the answer, EasyEdu asks you to explain it.
+                That one shift — student explains, AI listens and questions — makes understanding stick.
+            </p>
+            <a href="/problems" class="hero-cta">Start practising</a>
         </div>
+
+        <div class="section">
+            <div class="section-title">How it works</div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">Step 1</div>
+                    <h3>Pick a question</h3>
+                    <p>Browse questions organised by AP and IB course and chapter. Every question comes from the actual textbook.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">Step 2</div>
+                    <h3>Explain your reasoning</h3>
+                    <p>Type your answer as if you're teaching a classmate. Don't just copy the formula — explain why it works.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">Step 3</div>
+                    <h3>Get pushed deeper</h3>
+                    <p>If your answer is right but shallow, the system asks a follow-up. If it's wrong, it corrects the specific gap.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Courses available</div>
+            <div class="subjects">
+                <span class="subject-tag">AP Statistics</span>
+                <span class="subject-tag">AP Physics</span>
+                <span class="subject-tag">AP CS Principles</span>
+                <span class="subject-tag">IB Biology</span>
+                <span class="subject-tag">IB Computer Science</span>
+                <span class="subject-tag">IB Math AA HL</span>
+            </div>
+        </div>
+
     </div>
-    
-    <script>
-        // 初始化Lucide图标
-        lucide.createIcons();
-    </script>
 </body>
 </html>
