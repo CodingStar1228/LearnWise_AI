@@ -25,6 +25,12 @@ class StudentAgent:
             with open(prompt_path, "r", encoding="utf-8") as f:
                 prompt_template = f.read()
 
+            language = getattr(state, "language", "en")
+            if language == "zh":
+                lang_instruction = "你必须完全用中文回复，用中文提问。"
+            else:
+                lang_instruction = "You must respond entirely in English."
+
             system_text = prompt_template.format(
                 title=curr_question["title"],
                 content=curr_question["content"],
@@ -33,6 +39,7 @@ class StudentAgent:
                 is_right=evaluation.get("is_right"),
                 is_complete=evaluation.get("is_complete"),
                 reason=evaluation.get("reason", ""),
+                language_instruction=lang_instruction,
             )
 
             messages = [SystemMessage(content=system_text)]

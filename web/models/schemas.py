@@ -5,6 +5,7 @@ from datetime import datetime
 class SessionCreate(BaseModel):
     """创建会话请求模型"""
     question_id: str = Field(..., description="问题ID")
+    language: str = Field(default="en", description="回复语言：en=英文，zh=中文")
 
 class MessageCreate(BaseModel):
     """创建消息请求模型"""

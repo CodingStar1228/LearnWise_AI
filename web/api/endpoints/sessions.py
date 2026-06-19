@@ -18,7 +18,10 @@ qa_service = QAService()
 async def create_session(session_data: SessionCreate):
     """创建新会话"""
     try:
-        session_id = qa_service.create_session(session_data.question_id)
+        session_id = qa_service.create_session(
+            session_data.question_id,
+            language=session_data.language,
+        )
         return {"session_id": session_id}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

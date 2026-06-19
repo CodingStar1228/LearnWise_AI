@@ -44,10 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
             loadSimilarQuestions();
             
             // 创建会话
+            const lang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'en';
             const sessionResp = await fetch('/api/sessions', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({question_id: questionId})
+                body: JSON.stringify({question_id: questionId, language: lang})
             });
             
             if (!sessionResp.ok) {
@@ -58,7 +59,11 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionId = sessionData.session_id;
             
             // 显示系统欢迎消息
-            addSystemMessage("欢迎来到 EasyEdu 智能辅导系统！请为我讲解这道题目吧！");
+            const lang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'en';
+            const welcome = (lang === 'zh')
+                ? "欢迎来到 EasyEdu！请用自己的话讲解这道题目。"
+                : "Welcome to EasyEdu! Try explaining this question in your own words.";
+            addSystemMessage(welcome);
             
         } catch (error) {
             console.error('初始化失败:', error);
@@ -204,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="dot"></div>
                                 <div class="dot"></div>
                             </div>
-                            <span class="thinking-label">正在评估你的回答...</span>
+                            <span class="thinking-label" data-i18n="thinking">Evaluating your answer...</span>
                         </div>
                         <div class="thinking-bar"></div>
                     </div>

@@ -9,3 +9,4 @@ class State(BaseModel):
     question: list = Field(default=[], title="当前题目信息")
     evaluation: dict = Field(default={}, title="用户回复评估")
     log: str = Field(default="", title="节点执行日志")
+    language: str = Field(default="en", title="回复语言：en=英文，zh=中文")

@@ -71,6 +71,12 @@ class TeacherAgent:
             if knowledge_points:
                 knowledge_context = await knowledge_summry_search(knowledge_points)
 
+            language = getattr(state, "language", "en")
+            if language == "zh":
+                lang_instruction = "你必须完全用中文回复，包括所有解释、提问和总结。"
+            else:
+                lang_instruction = "You must respond entirely in English."
+
             system_text = prompt_template.format(
                 title=curr_question["title"],
                 content=curr_question["content"],
@@ -81,6 +87,7 @@ class TeacherAgent:
                 is_complete=evaluation.get("is_complete"),
                 reason=evaluation.get("reason", ""),
                 knowledge_context=knowledge_context or "N/A",
+                language_instruction=lang_instruction,
             )
 
             messages = [SystemMessage(content=system_text)]

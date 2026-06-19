@@ -13,13 +13,16 @@
     <nav class="fixed-nav">
         <div class="nav-logo">EasyEdu · IB/AP</div>
         <div class="nav-links">
-            <a href="/" class="nav-item">首页</a>
-            <a href="/problems" class="nav-item active">题目练习</a>
-            <a href="/knowledge" class="nav-item">知识点速记</a>
-            <a href="/upload" class="nav-item">上传题目</a>
-            <a href="/flashcards" class="nav-item">抽认卡</a>
+            <a href="/" class="nav-item" data-i18n="nav_home">Home</a>
+            <a href="/problems" class="nav-item active" data-i18n="nav_practice">Practice</a>
+            <a href="/knowledge" class="nav-item" data-i18n="nav_knowledge">Knowledge</a>
+            <a href="/upload" class="nav-item" data-i18n="nav_upload">Upload</a>
+            <a href="/flashcards" class="nav-item" data-i18n="nav_flash">Flashcards</a>
+            <button id="lang-toggle-btn" onclick="toggleLang()" style="margin-left:12px;padding:4px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;color:#374151;">中文</button>
         </div>
     </nav>
+    <script src="/static/js/i18n.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', initI18n);</script>
     
     <div class="main-container">
         <div class="content-wrapper">

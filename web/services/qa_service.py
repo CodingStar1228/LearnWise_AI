@@ -41,8 +41,8 @@ class QAService:
     def get_question_detail(self, question_id):
         return self.qa_system.get_question_detail(question_id)
 
-    def create_session(self, question_id):
-        return self.qa_system.create_session(question_id)
+    def create_session(self, question_id, language="en"):
+        return self.qa_system.create_session(question_id, language=language)
 
     async def process_answer(self, session_id, answer):
         logger.info(f"QAService.process_answer - session_id: {session_id}")

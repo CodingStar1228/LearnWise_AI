@@ -142,12 +142,13 @@ class KnowledgeQASystem:
         """
         return self.index_system.get_question(question_id)
     
-    def create_session(self, question_id: str) -> str:
+    def create_session(self, question_id: str, language: str = "en") -> str:
         """
         创建问答会话
         
         Args:
             question_id: 问题ID
+            language: 回复语言，"en" 或 "zh"
             
         Returns:
             会话ID
@@ -160,12 +161,12 @@ class KnowledgeQASystem:
         # 创建会话ID
         session_id = str(uuid4())
         
-        # 初始化会话元数据 (不存储消息历史，由LangGraph管理)
         self.sessions[session_id] = {
             "question_id": question_id,
             "question": question,
             "status": "created",
-            "last_evaluation": {}  # 最近一次评估结果
+            "last_evaluation": {},
+            "language": language,
         }
         
         return session_id
@@ -193,10 +194,11 @@ class KnowledgeQASystem:
         
         # 获取当前会话的工作流状态
         inputs = {
-            "messages": [user_message],  # 只传递当前消息，历史消息由LangGraph基于thread_id管理
+            "messages": [user_message],
             "question": [session["question"]],
             "evaluation": {},
-            "log": ""
+            "log": "",
+            "language": session.get("language", "en"),
         }
         
         print("开始处理回答...")
