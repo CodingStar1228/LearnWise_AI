@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
             sessionId = sessionData.session_id;
             
             // 显示系统欢迎消息
-            const lang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'en';
             const welcome = (lang === 'zh')
                 ? "欢迎来到 EasyEdu！请用自己的话讲解这道题目。"
                 : "Welcome to EasyEdu! Try explaining this question in your own words.";
