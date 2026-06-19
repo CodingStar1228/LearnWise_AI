@@ -21,22 +21,20 @@
             <button id="lang-toggle-btn" onclick="toggleLang()" style="margin-left:12px;padding:4px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:0.85rem;font-weight:600;color:#374151;">中文</button>
         </div>
     </nav>
-    <script src="/static/js/i18n.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', initI18n);</script>
-    
     <div class="main-container">
         <div class="content-wrapper">
             <div class="chapter-panel">
                 <h2 data-i18n="select_subject">Select a subject</h2>
                 <select id="subject-select" class="subject-select">
-                    <option value="" data-i18n-opt="all_subjects">All subjects</option>
+                    <option value="">All subjects</option>
                 </select>
                 <h2 class="panel-subtitle" data-i18n="chapter_list">Chapters</h2>
                 <ul id="chapter-list" class="list-panel"></ul>
             </div>
             
             <div class="questions-panel">
-                <h2 data-i18n="question_list">Questions — <span id="current-chapter-title"></span></h2>
+                <!-- 不要把 span 嵌进 data-i18n 元素里，applyI18n 用 textContent 会把 span 删掉 -->
+                <h2><span data-i18n="question_list">Questions</span> — <span id="current-chapter-title"></span></h2>
                 <div id="question-list" class="list-panel">
                     <p class="empty-tip" data-i18n="select_tip">Select a subject and chapter to view questions</p>
                 </div>
@@ -60,5 +58,7 @@
     </style>
     
     <script src="/static/js/problems.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', initI18n);</script>
 </body>
 </html> 
