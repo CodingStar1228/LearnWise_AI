@@ -27,18 +27,18 @@
     <div class="main-container">
         <div class="content-wrapper">
             <div class="chapter-panel">
-                <h2>选择科目</h2>
+                <h2 data-i18n="select_subject">Select a subject</h2>
                 <select id="subject-select" class="subject-select">
-                    <option value="">全部科目</option>
+                    <option value="" data-i18n-opt="all_subjects">All subjects</option>
                 </select>
-                <h2 class="panel-subtitle">章节列表</h2>
+                <h2 class="panel-subtitle" data-i18n="chapter_list">Chapters</h2>
                 <ul id="chapter-list" class="list-panel"></ul>
             </div>
             
             <div class="questions-panel">
-                <h2>题目列表 <span id="current-chapter-title"></span></h2>
+                <h2 data-i18n="question_list">Questions — <span id="current-chapter-title"></span></h2>
                 <div id="question-list" class="list-panel">
-                    <p class="empty-tip">请选择科目和章节查看题目</p>
+                    <p class="empty-tip" data-i18n="select_tip">Select a subject and chapter to view questions</p>
                 </div>
             </div>
         </div>

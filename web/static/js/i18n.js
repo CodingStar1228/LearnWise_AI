@@ -23,6 +23,8 @@ const I18N = {
     // problems page
     select_subject:"Select a subject",
     chapter_list:  "Chapters",
+    question_list: "Questions",
+    select_tip:    "Select a subject and chapter to view questions",
   },
   zh: {
     nav_home:      "首页",
@@ -42,6 +44,8 @@ const I18N = {
     thinking:      "正在评估你的回答...",
     select_subject:"选择科目",
     chapter_list:  "章节列表",
+    question_list: "题目列表",
+    select_tip:    "请选择科目和章节查看题目",
   }
 };
 

@@ -148,6 +148,17 @@ _FRONT_MATTER_PATTERNS = [
     r"committee\s+work",
     r"about\s+college\s+board",
     r"about\s+the\s+college\s+board",
+    r"contributor",
+    r"reviewer",
+    r"location\s+of\s+content",
+    r"to\s+the\s+(student|teacher|instructor|reader)",
+    r"how\s+to\s+use\s+this\s+book",
+    r"supplementary\s+materials",
+    r"index\s+of",
+    r"glossary",
+    r"^references\b",
+    r"bibliography",
+    r"answer\s+key",
 ]
 _FRONT_MATTER_RE = re.compile(
     "|".join(_FRONT_MATTER_PATTERNS), re.IGNORECASE
