@@ -194,6 +194,27 @@ def chunk_pages(pages: List[str], chunk_chars: int, skip_front: int) -> List[str
 
 
 # --------------------------------------------------------------------------- #
+# Per-book skip configuration (pages of front matter to skip)
+# Determined by inspecting each PDF's first 40 pages manually.
+# --------------------------------------------------------------------------- #
+_BOOK_SKIP: dict[str, int] = {
+    "ap_cs_principles_hare_4th":               6,
+    "ap_physics_5_steps_to_a_5_2023":          24,
+    "ap_statistics_the_practice_of_statistics": 25,
+    "ib_biology_hodder":                        12,
+    "ib_computer_science_hodder":               10,
+    # IB Math AA HL is a scanned image PDF — text extraction mostly fails.
+    # Skip 30 pages hoping some layers have embedded text; rely on filter.
+    "ib_math_aa_hl_analysis_and_approaches":    30,
+}
+
+
+def get_skip_front(pdf_path: Path, default: int) -> int:
+    slug = re.sub(r"[^a-z0-9]+", "_", pdf_path.stem.lower()).strip("_")[:48]
+    return _BOOK_SKIP.get(slug, default)
+
+
+# --------------------------------------------------------------------------- #
 # Helpers
 # --------------------------------------------------------------------------- #
 def slug_from_path(pdf_path: Path) -> str:
@@ -225,7 +246,10 @@ async def ingest_book(client, pdf_path: Path, course: str, args) -> dict:
         print(f"  [warn] no text extracted from {pdf_path.name} (scanned PDF? install OCR)")
         return {"pdf": pdf_path.name, "subject": subject, "status": "no_text"}
 
-    chunks = chunk_pages(pages, args.chunk_chars, args.skip_front)[: args.max_chunks]
+    skip = get_skip_front(pdf_path, args.skip_front)
+    if skip != args.skip_front:
+        print(f"  [info] using book-specific skip_front={skip} for {pdf_path.name}")
+    chunks = chunk_pages(pages, args.chunk_chars, skip)[: args.max_chunks]
     print(f"  {len(pages)} pages -> {len(chunks)} chunks (generating with LLM)")
 
     chapters = []
