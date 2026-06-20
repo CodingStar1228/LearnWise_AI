@@ -396,6 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 4. 设置内容
                 contentDiv.innerHTML = html;
                 contentDiv.classList.add('expanded');
+                // 触发 MathJax 重新渲染动态插入的公式
+                if (window.MathJax && MathJax.typesetPromise) {
+                    MathJax.typesetPromise([contentDiv]).catch(() => {});
+                }
                 
             } else {
                 // 学生消息使用Markdown
