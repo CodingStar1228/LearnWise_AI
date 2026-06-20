@@ -202,9 +202,12 @@ class KnowledgeQASystem:
         }
         
         print("开始处理回答...")
+        from langchain_core.messages import AIMessage as _AI
         async for msg, metadata in self.workflow.astream(inputs, config, stream_mode="messages"):
-            if hasattr(msg, "content") and msg.content:
-                yield msg.content, metadata.get("langgraph_node", "")
+            # 只取 AIMessage，过滤掉 SystemMessage / HumanMessage / ToolMessage 等
+            if isinstance(msg, _AI) and msg.content:
+                node = metadata.get("langgraph_node", "")
+                yield msg.content, node
         
 
     def get_session_info(self, session_id: str) -> Dict:
