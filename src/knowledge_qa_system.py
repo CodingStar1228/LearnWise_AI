@@ -202,20 +202,9 @@ class KnowledgeQASystem:
         }
         
         print("开始处理回答...")
-        # 优先用 custom 流接收逐 token 推送（stream_or_chat 会写 writer）
-        # 如果 custom 流没有产出任何内容（旧版 LangGraph 或 writer 不可用），
-        # 退回 messages 流，把完整 AIMessage 内容一次性返回。
-        got_any = False
-        async for chunk in self.workflow.astream(inputs, config, stream_mode="custom"):
-            if isinstance(chunk, dict) and "content" in chunk:
-                got_any = True
-                yield chunk["content"], chunk.get("node", "")
-
-        if not got_any:
-            # fallback: messages 流，至少能返回完整回复
-            async for msg, metadata in self.workflow.astream(inputs, config, stream_mode="messages"):
-                if hasattr(msg, "content") and msg.content:
-                    yield msg.content, metadata.get("langgraph_node", "")
+        async for msg, metadata in self.workflow.astream(inputs, config, stream_mode="messages"):
+            if hasattr(msg, "content") and msg.content:
+                yield msg.content, metadata.get("langgraph_node", "")
         
 
     def get_session_info(self, session_id: str) -> Dict:
